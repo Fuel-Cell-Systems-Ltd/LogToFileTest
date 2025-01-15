@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AppendToFileDaily" Id="{715cec78-0d5c-4b1d-91a2-8e437c10b462}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AppendToFileDaily
+VAR_INPUT
+    sNetId : T_AmsNetId;     // Net ID for file operations
+    sPath  : T_MaxString;    // Directory path for the log file
+    inputString : STRING(255); // Log entry to write
+    bExecute : BOOL;         // Trigger for logging
+    tTimeOut : TIME := DEFAULT_ADS_TIMEOUT;
+END_VAR
+VAR_OUTPUT
+    bBusy : BOOL;            // TRUE if logging is in progress
+    bError : BOOL;           // TRUE if an error occurs
+    nErrId : UDINT;          // Error ID in case of failure
+END_VAR
+VAR
+    fbFileOpen : FB_FileOpen;
+    fbFileClose : FB_FileClose;
+    fbFileWrite : FB_FileWrite;
+ 	fbGetSystemTime : GETSYSTEMTIME; // System time function block
+ 	fileTime : T_FILETIME;     // File time
+  
+    hFile : UINT := 0;       // File handle
+    sFilePath : STRING(255); // Full log file path
+    sTime : STRING;          // Date string for filename
+    sNewLine : STRING(2) := '$r$n'; // Newline character
+    msgString : STRING(255); // Full message with newline
+    Step : DWORD := 0;       // State machine step
+    RisingEdge : R_TRIG;     // Rising edge detector for execute signal
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+RisingEdge(CLK := bExecute);
+
+CASE Step OF
+    0: // Idle state
+        IF RisingEdge.Q THEN
+            bBusy := TRUE;
+            bError := FALSE;
+            nErrId := 0;
+            hFile := 0;
+          	
+            // Generate log file path with current date
+            fbGetSystemTime(timeLoDW=>fileTime.dwLowDateTime, timeHiDW=>fileTime.dwHighDateTime );
+	    	sTime := SYSTEMTIME_TO_STRING(FILETIME_TO_SYSTEMTIME(fileTime));
+        	sFilePath := CONCAT('C:\Logs\', CONCAT(LEFT(sTime, 10), '.txt'));
+     
+            Step := 1;
+        END_IF
+
+    1: // Open or create the log file
+        fbFileOpen(bExecute := FALSE);
+        fbFileOpen(sNetId := sNetId, sPathName := sFilePath, nMode := FOPEN_MODEAPPEND, ePath := PATH_GENERIC, tTimeout := tTimeOut, bExecute := TRUE);
+        Step := 2;
+
+    2: // Wait for file open
+        fbFileOpen(bExecute := TRUE);
+        IF NOT fbFileOpen.bBusy THEN
+            IF fbFileOpen.bError THEN
+                nErrId := fbFileOpen.nErrId;
+                bError := TRUE;
+                Step := 50; // Cleanup
+            ELSE
+                hFile := fbFileOpen.hFile;
+                Step := 3;
+            END_IF
+        END_IF
+
+    3: // Prepare the message to write
+        msgString := CONCAT(sNewLine, inputString);
+        Step := 4;
+
+    4: // Write the message to the file
+        fbFileWrite(bExecute := FALSE);
+        fbFileWrite(sNetId := sNetId, hFile := hFile, pWriteBuff := ADR(msgString), cbWriteLen := LEN(msgString), bExecute := TRUE, tTimeout := tTimeOut);
+        Step := 5;
+
+    5: // Wait for write completion
+        fbFileWrite(bExecute := TRUE);
+        IF NOT fbFileWrite.bBusy THEN
+            IF fbFileWrite.bError THEN
+                nErrId := fbFileWrite.nErrId;
+                bError := TRUE;
+                Step := 50; // Cleanup
+            ELSE
+                Step := 30; // Close file after writing
+            END_IF
+        END_IF
+
+    30: // Close the file
+        fbFileClose(bExecute := FALSE);
+        fbFileClose(sNetId := sNetId, hFile := hFile, bExecute := TRUE, tTimeout := tTimeOut);
+        Step := 31;
+
+    31: // Wait for file close
+        fbFileClose(bExecute := TRUE);
+        IF NOT fbFileClose.bBusy THEN
+            IF fbFileClose.bError THEN
+                nErrId := fbFileClose.nErrId;
+                bError := TRUE;
+            END_IF
+            Step := 50; // Final cleanup
+        END_IF
+
+    50: // Cleanup and reset
+        hFile := 0;
+        bBusy := FALSE;
+        Step := 0; // Return to idle state
+END_CASE
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
