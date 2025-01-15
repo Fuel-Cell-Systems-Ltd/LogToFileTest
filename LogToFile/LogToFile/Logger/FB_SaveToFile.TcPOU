@@ -64,16 +64,25 @@ _timeOut := timeout;]]></ST>
     <Method Name="M_CloseFile" Id="{74a5cdfb-1596-416f-ae36-d5091cb54b7b}" FolderPath="Private\">
       <Declaration><![CDATA[METHOD PRIVATE M_CloseFile : BOOL
 
-]]></Declaration>
+VAR_INPUT
+	execute : BOOL;	
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Attempt to close the file
-fileClose(bExecute := FALSE);
-fileClose(sNetId := _netId, hFile := fileRef, bExecute := TRUE, tTimeout := _timeOut);
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_CloseFile := FALSE;
+	RETURN;
+END_IF
 
-IF NOT fileClose.bBusy THEN
-    IF NOT M_HandleError(fileClose.bError, fileClose.nErrId) THEN
-        fileRef := 0; // Reset file handle
-    END_IF
+IF NOT fileOpen.bBusy THEN     
+ fileClose(sNetId := _netId, hFile := fileRef, tTimeout := _timeOut);
+END_IF
+
+// Attempt to close the file
+fileClose(bExecute := TRUE);
+
+IF NOT M_HandleError(fileClose.bError , fileClose.nErrId) THEN
+	fileRef := 0; // File handle
 END_IF
 
 M_CloseFile := fileClose.bBusy;]]></ST>
@@ -81,7 +90,6 @@ M_CloseFile := fileClose.bBusy;]]></ST>
     </Method>
     <Method Name="M_Cyclic" Id="{048234dc-7b91-4ead-bf56-35b1bb7740de}">
       <Declaration><![CDATA[METHOD M_Cyclic : BOOL
-
 
 VAR
 	status : BOOL;
@@ -105,28 +113,32 @@ CASE state OF
         END_IF
 
     OPEN_FILE: // Open the file
-        status := M_OpenFile();
+        status := M_OpenFile(TRUE);
         IF error THEN
-			state := RESET;
+			state := CLOSE_FILE;
         ELSIF ( fileRef <> 0 ) AND ( NOT status ) THEN
+			M_OpenFile(FALSE);
 			state := WRITE_TO_FILE;
         END_IF
 
     WRITE_TO_FILE: // Write to the file
-        status := M_WriteToFile(inputString := _data);
-        IF error THEN
-            state := RESET;
-        ELSIF NOT status THEN
-            state := CLOSE_FILE;
+        status := M_WriteToFile(execute := TRUE, inputString := _data);
+        IF error  OR ( NOT status ) THEN
+			M_WriteToFile(FALSE, '');
+			state := CLOSE_FILE;
         END_IF
 
     CLOSE_FILE: // Close the file
-       status :=  M_CloseFile();
-       IF error THEN
-            state := RESET;
-       ELSIF NOT status THEN
-            state := RESET;
-        END_IF
+       IF fileREF <> 0 THEN
+			status :=  M_CloseFile(TRUE);
+			IF error OR ( NOT status ) THEN
+				M_CloseFile(FALSE);
+				state := RESET;
+        	END_IF
+		ELSE
+			M_CloseFile(FALSE);
+			state := RESET;
+	   END_IF
 
     RESET: // Cleanup and reset
         busy := FALSE;
@@ -156,6 +168,10 @@ M_HandleError := check;]]></ST>
     <Method Name="M_OpenFile" Id="{0bcc0ab2-295e-4291-b686-cbac508c09eb}" FolderPath="Private\">
       <Declaration><![CDATA[METHOD PRIVATE M_OpenFile : BOOL
 
+VAR_INPUT
+	execute : BOOL;	
+END_VAR
+
 VAR
 	getSystemTime : GETSYSTEMTIME; // System time function block
 	fileTime : T_FILETIME;     // File time
@@ -163,7 +179,13 @@ VAR
 	filePath : STRING; 	// Full log file path
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF _dirPath = '' THEN
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_OpenFile := FALSE;
+	RETURN;
+END_IF
+
+IF _dirPath = '' THEN
    	M_HandleError(TRUE , 99);
 	M_OpenFile := FALSE;
     RETURN;
@@ -177,11 +199,11 @@ IF NOT fileOpen.bBusy THEN
 	filePath := CONCAT(filepath, LEFT(dateString, 10)); // Add date to file path
 	filePath := CONCAT(filepath, _fileExtension); 		// Add file extension to file path.
      
-  fileOpen(sNetId := '', sPathName := 'C:\Logs\Test.txt', nMode := FOPEN_MODEAPPEND, ePath := PATH_GENERIC, tTimeout := _timeOut);
+	fileOpen(sNetId := '', sPathName := filePath, nMode := FOPEN_MODEAPPEND, ePath := PATH_GENERIC, tTimeout := _timeOut);
 END_IF
 
 // Attempt to open the file
-	fileOpen(bExecute := TRUE);
+fileOpen(bExecute := TRUE);
 
 IF NOT M_HandleError(fileOpen.bError , fileOpen.nErrId) THEN
 	fileRef := fileOpen.hFile; // File handle
@@ -194,6 +216,7 @@ M_OpenFile := fileOpen.bBusy;]]></ST>
       <Declaration><![CDATA[METHOD PRIVATE M_WriteToFile : BOOL
 
 VAR_INPUT
+	execute : BOOL;
 	inputString : STRING; // Log entry to write
 END_VAR
 
@@ -202,21 +225,31 @@ END_VAR
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF LEN(inputString) > (SIZEOF(msgString) - LEN(NEW_LINE)) THEN
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_WriteToFile := FALSE;
+	RETURN;
+END_IF
+
+IF LEN(inputString) > (SIZEOF(msgString) - LEN(NEW_LINE)) THEN
 	M_HandleError( TRUE, 98);
     M_WriteToFile := FALSE;
 	RETURN;
 END_IF
 
-// Prepare the message with a newline
-msgString := CONCAT(NEW_LINE, inputString);
-
-// Write the message to the file
-fileWrite(bExecute := FALSE);
-fileWrite(sNetId := _netId, hFile := fileRef, pWriteBuff := ADR(msgString), cbWriteLen := LEN(msgString), bExecute := TRUE, tTimeout := +_timeOut);
-
 IF NOT fileWrite.bBusy THEN
-	M_HandleError(fileWrite.bError , fileWrite.nErrId);
+	// Prepare the message with a newline
+	msgString := CONCAT(NEW_LINE, inputString);
+
+	// Write the message to the file
+	fileWrite(sNetId := _netId, hFile := fileRef, pWriteBuff := ADR(msgString), cbWriteLen := LEN(msgString), tTimeout := +_timeOut);
+END_IF
+
+// Attempt to write the file
+fileWrite(bExecute := TRUE);
+
+IF NOT M_HandleError(fileWrite.bError , fileWrite.nErrId) THEN
+	fileRef := fileOpen.hFile; // File handle
 END_IF
 
 M_WriteToFile := fileWrite.bBusy;]]></ST>

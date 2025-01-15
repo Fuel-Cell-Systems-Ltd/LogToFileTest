@@ -5,9 +5,6 @@
     <CycleTime>10000</CycleTime>
     <Priority>20</Priority>
     <PouCall>
-      <Name>PRG_Main</Name>
-    </PouCall>
-    <PouCall>
       <Name>PRG_Logging</Name>
     </PouCall>
     <TaskFBGuid>{f4d90ac3-7e7b-4bed-b7d8-30c4d3ef4263}</TaskFBGuid>

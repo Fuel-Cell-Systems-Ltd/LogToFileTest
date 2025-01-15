@@ -12,7 +12,7 @@ END_VAR
 
 VAR
 	bLog : BOOL := FALSE; // Trigger to log data
-
+	
 	SysLogger : FB_SaveToFile(settings := SYSTEM_LOG_SETTINGS, timeOut := SYSTEM_LOG_TIMEOUT);
 	SysLogBuffer : ARRAY[1..SYSTEM_LOG_BUFFER] OF STRING;
 END_VAR
@@ -23,14 +23,13 @@ END_VAR
 IF NOT SysLogger.busy THEN
 	IF bLog THEN
 		SysLogger.pData := 'This is a test sting"';
-		SysLogger.pExecute := TRUE;		
-	ELSIF SysLogger.error THEN
-		    // Handle error
-	ELSE
-		bLog := FALSE; // Reset trigger
-		SysLogger.pExecute := FALSE;		
- 	END_IF
+		SysLogger.pExecute := TRUE;	
+	END_IF
+ELSE
+	bLog := FALSE; // Reset trigger
+	SysLogger.pExecute := FALSE;		
 END_IF
+
 IF SysLogger.error THEN
 	bLog := FALSE; // Reset trigger
 	SysLogger.pExecute := FALSE;	
