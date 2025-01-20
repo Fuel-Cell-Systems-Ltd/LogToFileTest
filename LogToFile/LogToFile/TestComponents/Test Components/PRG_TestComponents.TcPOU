@@ -11,7 +11,7 @@ VAR
 	Component_2 : FB_Test_Component := (Name := 'TC-02');
 
 	// Test Triggers
-	Trig1, Trig2 : BOOL;
+	Trig1a, Trig1b, Trig2a, Trig2b : BOOL;
 END_VAR
 
 ]]></Declaration>
@@ -29,8 +29,10 @@ iComponent1 := Component_1;
 iComponent1 := Component_2;
 
 // Map Parameters
-Component_1.pTrig := Trig1;
-Component_2.pTrig := Trig2;
+Component_1.pTrig := Trig1a;
+Component_1.pTrig2 := Trig1b;
+Component_2.pTrig := Trig2a;
+Component_2.pTrig2 := Trig2b;
 
 // Cylic Calls
 Component_1.CyclicLogic();

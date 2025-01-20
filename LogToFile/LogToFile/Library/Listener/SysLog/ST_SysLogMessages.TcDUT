@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_SysLogMessages" Id="{242ca52c-3daf-4921-a4c8-16e3e378d102}">
+    <Declaration><![CDATA[TYPE ST_SysLogMessages :
+    STRUCT
+        Timestamp : T_MaxString;
+        Message   : T_MaxString;
+	    LogLevel  : E_SysLogLevel;
+		Source    : T_MaxString;
+        Context   : T_MaxString;
+        ScanCount : UDINT;
+        Flags     : UDINT;
+		Json   : T_MaxString;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

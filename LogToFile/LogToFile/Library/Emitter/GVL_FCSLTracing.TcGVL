@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_FCSLTracing" Id="{e4360a75-728d-417b-8b2a-c33f9f75dce4}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	// System Log [Saved to Disk]
+	sysLogLevel : E_SysLogLevel := E_SysLogLevel.testing;  // Current level to log to file	
+	sysLog : FB_SysLog;
+	
+	// Audit Log
+	auditLog : FB_AuditLog;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

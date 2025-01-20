@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_Log_Main" Id="{bb1d0e3f-e339-4d05-b071-4015d4af0ed5}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_Log_Main
+
+VAR
+	sysLogger 		: FB_SysLogLIstener;
+	auditLogger		: FB_AuditLogLIstener;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[sysLogger.CyclicLogic();
+auditLogger.CyclicLogic();]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

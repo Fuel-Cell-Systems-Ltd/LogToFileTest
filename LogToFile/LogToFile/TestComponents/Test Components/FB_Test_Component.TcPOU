@@ -64,11 +64,14 @@ Trig(CLK := _trig);
 Trig2(CLK := _trig2);
 
 IF Trig.Q THEN
-	M_SysLog(msg := CONCAT(Name, ' : Has being triggered'), debug := E_LogDebugLevel.testing);
+	M_SysLog(msg := CONCAT(Name, ' : Has being triggered 1'), debug := E_SysLogLevel.testing);
 END_IF
 
+IF Trig.Q THEN
+	M_SysLog(msg := CONCAT(Name, ' : Has being triggered 2'), debug := E_SysLogLevel.testing);
+END_IF
 IF Trig2.Q THEN
-	M_AuditLog(msg := CONCAT(Name, ' : Has being triggered'), debug := E_LogDebugLevel.testing);
+	M_AuditLog(k := 'Login', v := 'User 1234 has logged in');
 END_IF
 
 (*
@@ -108,8 +111,7 @@ METHOD PROTECTED Initialize : BOOL
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// TODO : {error 'Programming instruction - Add code to initialize your Component'}
-
-M_SysLog(msg := CONCAT(Name, ' : Has being initalized'), debug := E_LogDebugLevel.production);
+M_SysLog(msg := CONCAT(Name, ' : Has being initalized'), debug := E_SysLogLevel.production);
 
 // Call Super
 Initialize := Super^.Initialize();]]></ST>

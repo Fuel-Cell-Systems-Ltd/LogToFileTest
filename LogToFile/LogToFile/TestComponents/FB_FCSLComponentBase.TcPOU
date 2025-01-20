@@ -13,11 +13,12 @@ END_VAR]]></Declaration>
       <Declaration><![CDATA[METHOD M_AuditLog : HRESULT
 
 VAR_INPUT
-	message : T_MaxString;
+	k : T_MaxString;
+	v : T_MaxString;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[GVL_FCSLTracing.sysLog.M_AddEntry(Source := InstancePath, Message := Message, logType:= E_LogType.auditLog, Flags := 0);
+        <ST><![CDATA[GVL_FCSLTracing.auditLog.M_AddEntry(k := k, v := v);
 
 M_AuditLog := S_OK;]]></ST>
       </Implementation>
@@ -27,7 +28,7 @@ M_AuditLog := S_OK;]]></ST>
 
 VAR_INPUT
 	msg : T_MaxString;
-	debug : E_LogDebugLevel;
+	debug : E_SysLogLevel;
 END_VAR
 
 VAR
@@ -36,26 +37,15 @@ VAR
 	json : T_MaxString;	
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF debug = E_LogDebugLevel.invlid THEN
+        <ST><![CDATA[IF debug = E_SysLogLevel.invlid THEN
 	RETURN;
 END_IF
 
-// Convert debug enum to string and integer representations
-debugString := TO_STRING(debug);
-debugINT := debug;
-
-// Construct JSON string manually
-json := CONCAT('{"DebugName":"', debugString);
-//json := CONCAT(json, '"}');
-json := CONCAT(json, '", "DebugLevel":"');
-json := CONCAT(json, TO_STRING(debugINT));
-json := CONCAT(json, '"}');
-
-// Send log entry with constructed JSON
+// Send log entry
 GVL_FCSLTracing.sysLog.M_AddEntry(
     Source := InstancePath, 
     Message := msg, 
-    logType := E_LogType.sysLog, 
+    logLevel := debug, 
     Flags := 0
 );
 

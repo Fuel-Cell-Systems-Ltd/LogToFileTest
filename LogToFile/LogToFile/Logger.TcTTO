@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Task Name="Logger" Id="{030fc9fe-bc5d-4bd5-9b11-0039936c722d}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>10000</CycleTime>
+    <Priority>6</Priority>
+    <PouCall>
+      <Name>PRG_Log_Main</Name>
+    </PouCall>
+    <TaskFBGuid>{2b5e2636-274b-4395-84f9-12159acf5700}</TaskFBGuid>
+    <Fb_init>{cd7fe9d1-e542-4792-98a3-99b7217a99d9}</Fb_init>
+    <Fb_exit>{839c4f1a-4f2c-478f-b639-19325bcaec52}</Fb_exit>
+    <CycleUpdate>{77d97f08-c381-4ae7-a218-cf436fb9f222}</CycleUpdate>
+    <PostCycleUpdate>{67142572-81f0-46de-8203-fb0d82d8650a}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

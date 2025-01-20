@@ -21,47 +21,50 @@
     <Compile Include="DUTs\E_Result.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_SysLogMsgListener.TcPOU">
+    <Compile Include="Library\Listener\AuditLog\FB_AuditLogListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_SysLogListener.TcPOU">
+    <Compile Include="Library\Listener\AuditLog\FB_AuditLogMsgListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_AuditLogListener.TcPOU">
+    <Compile Include="Library\Listener\AuditLog\I_AuditLogListener.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_AuditLogMsgListener.TcPOU">
+    <Compile Include="Library\Listener\AuditLog\ST_AuditLogMessages.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\I_FCSLTraceListener.TcIO">
+    <Compile Include="Library\Listener\PRG_Log_Main.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\ST_FCSLTraceMessage.TcDUT">
+    <Compile Include="Library\Listener\SysLog\FB_SysLogListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\PRG_Log_Main.TcPOU">
+    <Compile Include="Library\Listener\SysLog\FB_SysLogMsgListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Tracing\E_LogDebugLevel.TcDUT">
+    <Compile Include="Library\Listener\SysLog\I_SysLogListener.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Tracing\E_LogType.TcDUT">
+    <Compile Include="Library\Listener\SysLog\ST_SysLogMessages.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Tracing\FB_SysLog.TcPOU">
+    <Compile Include="Library\Emitter\AuditLog\FB_AuditLog.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Tracing\FB_AuditLog.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Library\Tracing\GVL_FCSLTracing.TcGVL">
+    <Compile Include="Library\Emitter\GVL_FCSLTracing.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
-    <Compile Include="TestComponents\FB_FCSLComponentBase.TcPOU">
+    <Compile Include="Library\Emitter\SysLog\E_SysLogLevel.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TestComponents\F_CreateJSON.TcPOU">
+    <Compile Include="Library\Emitter\SysLog\FB_SysLog.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logger.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestComponents\FB_FCSLComponentBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TestComponents\Test Components\FB_Test_Component.TcPOU">
@@ -104,7 +107,11 @@
   <ItemGroup>
     <Folder Include="DUTs" />
     <Folder Include="Library\Listener" />
-    <Folder Include="Library\Tracing" />
+    <Folder Include="Library\Listener\AuditLog" />
+    <Folder Include="Library\Listener\SysLog" />
+    <Folder Include="Library\Emitter" />
+    <Folder Include="Library\Emitter\AuditLog" />
+    <Folder Include="Library\Emitter\SysLog" />
     <Folder Include="TestComponents\Test Components" />
     <Folder Include="LogToFile" />
     <Folder Include="TestComponents" />
@@ -162,8 +169,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -230,14 +237,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

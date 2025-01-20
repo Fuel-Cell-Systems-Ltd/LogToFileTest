@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_SysLogListener" Id="{b46ba456-5ae1-4c47-8197-f2528ac4dd97}">
+    <Declaration><![CDATA[INTERFACE I_SysLogListener
+]]></Declaration>
+    <Method Name="OnTraceReceived" Id="{ecb04e39-5a33-41e2-ab97-d56f2aed52c4}">
+      <Declaration><![CDATA[METHOD OnTraceReceived
+VAR_INPUT
+    Message : ST_SysLogMessages;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
