@@ -21,10 +21,16 @@
     <Compile Include="DUTs\E_Result.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_FCSLMessageListener.TcPOU">
+    <Compile Include="Library\Listener\FB_SysLogMsgListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\FB_FCSLTraceListenerBase.TcPOU">
+    <Compile Include="Library\Listener\FB_SysLogListener.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Listener\FB_AuditLogListener.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Listener\FB_AuditLogMsgListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Listener\I_FCSLTraceListener.TcIO">
@@ -42,7 +48,10 @@
     <Compile Include="Library\Tracing\E_LogType.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Tracing\FB_FCSLTraceLog.TcPOU">
+    <Compile Include="Library\Tracing\FB_SysLog.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Tracing\FB_AuditLog.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Tracing\GVL_FCSLTracing.TcGVL">
@@ -153,8 +162,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -221,14 +230,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="Boolean">System.Boolean</Type>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

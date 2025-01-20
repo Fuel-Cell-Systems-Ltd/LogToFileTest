@@ -17,7 +17,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[GVL_FCSLTracing.FCSLGlobalTraceLog.M_AddEntry(Source := InstancePath, Message := Message, logType:= E_LogType.auditLog, Flags := 0);
+        <ST><![CDATA[GVL_FCSLTracing.sysLog.M_AddEntry(Source := InstancePath, Message := Message, logType:= E_LogType.auditLog, Flags := 0);
 
 M_AuditLog := S_OK;]]></ST>
       </Implementation>
@@ -52,12 +52,11 @@ json := CONCAT(json, TO_STRING(debugINT));
 json := CONCAT(json, '"}');
 
 // Send log entry with constructed JSON
-GVL_FCSLTracing.FCSLGlobalTraceLog.M_AddEntryWithJson(
+GVL_FCSLTracing.sysLog.M_AddEntry(
     Source := InstancePath, 
     Message := msg, 
     logType := E_LogType.sysLog, 
-    Flags := 0, 
-    Json := json
+    Flags := 0
 );
 
 // Return success

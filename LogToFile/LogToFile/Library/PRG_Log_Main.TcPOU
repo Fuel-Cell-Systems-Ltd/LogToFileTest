@@ -4,7 +4,7 @@
     <Declaration><![CDATA[PROGRAM PRG_Log_Main
 
 VAR
-	logger : FB_FCSLTraceListenerBase;
+	logger : FB_SysLogLIstener;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[logger.CyclicLogic();

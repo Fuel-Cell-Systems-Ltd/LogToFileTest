@@ -1,16 +1,50 @@
 <?xml version="1.0"?>
 <TcEventSources Version="2">
 	<Translations>
+		<Text TxtId="Arguments:&#13;&#10;0 - Textual message"/>
 		<Text TxtId="Arguments:&#13;&#10;0 - Textual message&#13;&#10;1 - DC Timestamp&#13;&#10;2 - Instance (FB name)&#13;&#10;3 - Context (Calling task)&#13;&#10;4 - ScanCount&#13;&#10;5 - Flags"/>
 		<Text TxtId="DT_ComponentBase_Event_SimulationWarning">
 			<Text LcId="1033">{0} - Component is in Simulation mode - Hardware will not operate</Text>
 		</Text>
 		<Text TxtId="DT_EventClass_ComponentBase"/>
 		<Text TxtId="DT_GLOBAL_INIT_REFERENCE_EVENT"/>
+		<Text TxtId="Logging"/>
 		<Text TxtId="Reference Event that should be the first in all event classes"/>
 		<Text TxtId="Trace Log"/>
+		<Text TxtId="{0}"/>
 		<Text TxtId="{0}|{1}|{2}|{3}|{4}|{5}"/>
 	</Translations>
+	<Source>
+		<GUID>{CC873929-243A-4CC6-8DD9-46A81F27D52E}</GUID>
+		<Name>Logging</Name>
+		<Event>
+			<Id>1</Id>
+			<Message>{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text>Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+		<Event>
+			<Id>2</Id>
+			<Message>{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text>Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+		<Event>
+			<Id>3</Id>
+			<Message>{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text>Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+	</Source>
 	<Source>
 		<GUID>{3DFE3E0C-5558-48D5-BDF1-F8F81BAADC6F}</GUID>
 		<Name>DT_EventClass_ComponentBase</Name>

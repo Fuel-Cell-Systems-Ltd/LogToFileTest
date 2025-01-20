@@ -1,6 +1,37 @@
 <?xml version="1.0"?>
 <TcEventSources Version="2">
 	<Source>
+		<GUID>{CC873929-243A-4CC6-8DD9-46A81F27D52E}</GUID>
+		<Name LcId="1033">Logging</Name>
+		<Event>
+			<Id>1</Id>
+			<Message LcId="1033">{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text LcId="1033">Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+		<Event>
+			<Id>2</Id>
+			<Message LcId="1033">{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text LcId="1033">Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+		<Event>
+			<Id>3</Id>
+			<Message LcId="1033">{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text LcId="1033">Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+	</Source>
+	<Source>
 		<GUID>{3DFE3E0C-5558-48D5-BDF1-F8F81BAADC6F}</GUID>
 		<Name LcId="1033">DT_EventClass_ComponentBase</Name>
 		<Event>

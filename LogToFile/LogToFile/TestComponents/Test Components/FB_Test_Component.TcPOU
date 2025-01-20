@@ -6,6 +6,8 @@
 VAR
 	_trig : BOOL;
 	Trig : R_TRIG;
+	_trig2 : BOOL;
+	Trig2 : R_TRIG;
 END_VAR
 
 VAR
@@ -59,14 +61,14 @@ END_IF
 //{error 'Programming instruction - Write your custom component cyclic cogic here'}
 
 Trig(CLK := _trig);
+Trig2(CLK := _trig2);
 
 IF Trig.Q THEN
 	M_SysLog(msg := CONCAT(Name, ' : Has being triggered'), debug := E_LogDebugLevel.testing);
-//M_SysLog(msg := CONCAT(Name, ' : input has being triggered during Test'), debug := E_LogDebugLevel.commissioning);
-(*	msg := CONCAT(Name, ' : input has being triggered during Commissioning');
-	M_SysLog(msg := msg, debug :=  E_LogDebugLevel.commissioning);
-	msg := CONCAT(Name, ' : input has being triggered during Production');
-	M_SysLog(msg := msg, debug :=  E_LogDebugLevel.production);*)
+END_IF
+
+IF Trig2.Q THEN
+	M_AuditLog(msg := CONCAT(Name, ' : Has being triggered'), debug := E_LogDebugLevel.testing);
 END_IF
 
 (*
@@ -129,6 +131,25 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_trig := pTrig;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="pTrig2" Id="{bff14ddd-be64-430c-bab9-53d8c94a9042}">
+      <Declaration><![CDATA[PROPERTY pTrig2 : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a300b180-cc1e-4b95-a88c-8654a9b58184}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[pTrig2 := _trig2;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1df91c02-74bd-4908-8347-9e3dbfa6784e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_trig2 := pTrig2;]]></ST>
         </Implementation>
       </Set>
     </Property>

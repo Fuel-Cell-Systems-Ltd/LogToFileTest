@@ -3,7 +3,8 @@
   <GVL Name="GVL_FCSLTracing" Id="{e4360a75-728d-417b-8b2a-c33f9f75dce4}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
-	FCSLGlobalTraceLog : FB_FCSLTraceLog;
+	sysLog : FB_SysLog;
+	auditLog : FB_AuditLog;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

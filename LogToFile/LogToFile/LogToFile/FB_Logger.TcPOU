@@ -23,7 +23,7 @@ VAR
 	exportTimer: TON;
 	WRITETOFILE : BOOL;
 	
-	SaveFile : FB_SaveToFile;
+	SaveFile : FB_SaveToFile(LOG_SETTINGS, LOG_TIMEOUT);
 END_VAR
 
 
@@ -108,7 +108,7 @@ VAR
 	data : STRING(255);
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SaveFile.pData := data := ringBuffer.A_RemoveHead();
+        <ST><![CDATA[// SaveFile.pData := data := ringBuffer.A_RemoveHead();
 SaveFile.pExecute := TRUE;
 WRITETOFILE := FALSE;;]]></ST>
       </Implementation>

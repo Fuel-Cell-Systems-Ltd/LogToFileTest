@@ -17,7 +17,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{96161287-A33F-4BB6-BAB2-5B548564D5FC}" Name="LogToFile" PrjFilePath="LogToFile\LogToFile.plcproj" TmcFilePath="LogToFile\LogToFile.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{0A41150D-22D5-24F6-658E-3EF413F251C7}" TmcPath="LogToFile\LogToFile.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{257BF344-3D24-F1B9-F076-4140422451F1}" TmcPath="LogToFile\LogToFile.tmc">
 					<Name>LogToFile Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="2" AreaNo="1">
