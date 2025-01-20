@@ -23,7 +23,7 @@ END_IF
 
 MessageListener.Execute();
 
-Logger.M_CyclicLogic();]]></ST>
+Logger.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{45325fa3-d6b5-4bf1-9a78-4cf32688947a}">
@@ -69,5 +69,20 @@ flags     := message.Flags;
 Logger.M_AddSysLog(1,msg);]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_SysLogListener">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLogListener.CyclicLogic">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLogListener.Initialize">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLogListener.OnTraceReceived">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
