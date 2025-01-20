@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<TcLicenseInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2011/11/TcLicenseInfo">
+	<LicenseInfo>
+		<SystemId>{F351ABBA-7385-2953-C5A6-BB1AEAAFB8B5}</SystemId>
+		<IssueTime>2025-01-20T12:00:00</IssueTime>
+		<ExpireTime>2025-01-28T00:00:00</ExpireTime>
+		<LicenseKey>20f495decbee066d162fb253bba7fa55c991a17dabac12ed6c5d470d0c6ea77ae226d2136538d23228cfd7f493106fc9dab884ab3c90fc928332bee31bbd365da95cc7a9f999b0483dedd70871e9b3defd72e18af94a5a39a2dc44679f547392eab0877f77605262b22df158eb74b4ca8d04ad877c9b3a6ca937e25901ae5aee7f15b6f1cb7eaaf69604109965bda61385edd0eb094b1634ba1bf785d298588f0c1ef2b7a2b078e4a76a1db79ab65cace16a535c5c37857a90f8c2a6835f95dc0c1b0f53a5f14135e5a0b07758e77dc677b7ca072384cf761e015d3736e1760809c46d7389110b6b122d80a4be3f3814c84f8e59b1e96e8d27bfcc55d13799e8</LicenseKey>
+		<License>
+			<LicenseId>{461F547B-9F81-4C4D-8BE6-01F8B3B14C86}</LicenseId>
+			<Name>TC3 Building Automation Basic</Name>
+			<OrderNo>TF8010</OrderNo>
+		</License>
+		<License>
+			<LicenseId>{094750FD-A1AB-4B28-8DE8-8B6CACD0EDE6}</LicenseId>
+			<Name>TC3 Light Solution</Name>
+			<OrderNo>TF8050</OrderNo>
+		</License>
+		<License>
+			<LicenseId>{4C256767-E6E6-4AF5-BD68-9F7ABAD0C200}</LicenseId>
+			<Name>TC3 ADS</Name>
+			<OrderNo>TC1000</OrderNo>
+		</License>
+		<License>
+			<LicenseId>{3FF18E97-7754-401B-93FB-70544DE28A13}</LicenseId>
+			<Name>TC3 IO</Name>
+			<OrderNo>TC1100</OrderNo>
+		</License>
+		<License>
+			<LicenseId>{66689887-CCBD-452C-AC9A-039D997C6E66}</LicenseId>
+			<Name>TC3 PLC</Name>
+			<OrderNo>TC1200</OrderNo>
+		</License>
+	</LicenseInfo>
+</TcLicenseInfo>

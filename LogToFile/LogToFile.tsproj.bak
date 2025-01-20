@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.12">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.64">
 	<Project ProjectGUID="{98646747-5D6C-4854-8A16-71B80CBE6F13}" Target64Bit="true" AutoPrioManagement="true" ShowHideConfigurations="#x6">
 		<System>
-			<Settings MaxCpus="16" NonWinCpus="1" PCoreAffinity="4095" ECoreAffinity="61440">
+			<Settings MaxCpus="16" NonWinCpus="1">
 				<Cpu CpuId="15"/>
 				<IoIdleTask Priority="4"/>
 			</Settings>
@@ -17,22 +17,9 @@
 		</System>
 		<Plc>
 			<Project GUID="{96161287-A33F-4BB6-BAB2-5B548564D5FC}" Name="LogToFile" PrjFilePath="LogToFile\LogToFile.plcproj" TmcFilePath="LogToFile\LogToFile.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{95500B4A-9C02-4AD8-CCBD-DA3686D6E2F0}" TmcPath="LogToFile\LogToFile.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="LogToFile\LogToFile.tmc" TmcHash="{AE4C3581-2B9A-8DCD-02D0-9E4CA1DD193C}">
 					<Name>LogToFile Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
-						<Name>PlcTask Outputs</Name>
-						<Var>
-							<Name>PRG_TestComponents.Component_1.MyOutput</Name>
-							<Comment><![CDATA[ Outputs]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>PRG_TestComponents.Component_2.MyOutput</Name>
-							<Comment><![CDATA[ Outputs]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>PlcTask Inputs</Name>
 						<Var>
@@ -43,6 +30,19 @@
 						<Var>
 							<Name>PRG_TestComponents.Component_2.MyInput</Name>
 							<Comment><![CDATA[ Inputs]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
+						<Name>PlcTask Outputs</Name>
+						<Var>
+							<Name>PRG_TestComponents.Component_1.MyOutput</Name>
+							<Comment><![CDATA[ Outputs]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_TestComponents.Component_2.MyOutput</Name>
+							<Comment><![CDATA[ Outputs]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
