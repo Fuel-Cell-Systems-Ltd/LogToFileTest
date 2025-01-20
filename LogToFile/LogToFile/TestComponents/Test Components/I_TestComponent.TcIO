@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_TestComponent" Id="{ca947f9d-2dd4-42c6-a605-220dd9999fff}">
+    <Declaration><![CDATA[INTERFACE I_TestComponent EXTENDS I_BaseFB
+]]></Declaration>
+  </Itf>
+</TcPlcObject>

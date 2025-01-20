@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_LoggerSettings" Id="{cbd5a83d-7979-4719-b53b-191049e3be23}">
+    <Declaration><![CDATA[TYPE ST_LoggerSettings :
+STRUCT
+	netID : STRING(20);
+	filePath : T_MaxString;
+	filePrefix : STRING(10);
+	FileType : STRING(10);
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

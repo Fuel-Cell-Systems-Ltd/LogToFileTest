@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_FCSLComponentBase" Id="{293810a7-d588-4a02-bf97-9f4610062714}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FCSLComponentBase EXTENDS FB_ComponentBase
+
+VAR
+
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="M_AuditLog" Id="{abb9e373-22da-47da-a2c3-e3f1e7cd875a}">
+      <Declaration><![CDATA[METHOD M_AuditLog : HRESULT
+
+VAR_INPUT
+	message : T_MaxString;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GVL_FCSLTracing.FCSLGlobalTraceLog.M_AddEntry(Source := InstancePath, Message := Message, logType:= E_LogType.auditLog, Flags := 0);
+
+M_AuditLog := S_OK;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_SysLog" Id="{b4fab106-d19e-44ac-9789-66501b183208}">
+      <Declaration><![CDATA[METHOD M_SysLog : HRESULT
+
+VAR_INPUT
+	msg : T_MaxString;
+	debug : E_LogDebugLevel;
+END_VAR
+
+VAR
+	debugString : STRING;
+	debugINT : UDINT;
+	json : T_MaxString;	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF debug = E_LogDebugLevel.invlid THEN
+	RETURN;
+END_IF
+
+// Convert debug enum to string and integer representations
+debugString := TO_STRING(debug);
+debugINT := debug;
+
+// Construct JSON string manually
+json := CONCAT('{"DebugName":"', debugString);
+//json := CONCAT(json, '"}');
+json := CONCAT(json, '", "DebugLevel":"');
+json := CONCAT(json, TO_STRING(debugINT));
+json := CONCAT(json, '"}');
+
+// Send log entry with constructed JSON
+GVL_FCSLTracing.FCSLGlobalTraceLog.M_AddEntryWithJson(
+    Source := InstancePath, 
+    Message := msg, 
+    logType := E_LogType.sysLog, 
+    Flags := 0, 
+    Json := json
+);
+
+// Return success
+M_SysLog := S_OK;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

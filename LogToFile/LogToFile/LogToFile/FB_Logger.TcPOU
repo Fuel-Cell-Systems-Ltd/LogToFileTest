@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Logger" Id="{bd6328df-bac3-410f-b20c-6bd1fa88f7d8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Logger
+
+VAR CONSTANT
+	LOG_SETTINGS : ST_LoggerSettings := (netID := '', filePath := 'C:\Logs\', filePrefix := 'SystemApp_', FileType := '.txt');	
+	LOG_TIMEOUT : TIME := T#5S;
+END_VAR
+
+VAR
+	bLog : BOOL := FALSE; // Trigger to log data
+	
+	logger : FB_SaveToFile(settings := LOG_SETTINGS, timeOut := LOG_TIMEOUT);
+
+    ringBuffer : FB_StringRingBuffer;
+    bufferMemory : ARRAY[0..1023] OF BYTE; // Adjust size as needed
+    lastExportTime : TIME := T#0S;
+    exportInterval : TIME := T#1S; // Export interval (1 second)
+    fileLoggerBusy : BOOL := FALSE;
+	
+	firstCycle : BOOL := TRUE;
+	exportTimer: TON;
+	WRITETOFILE : BOOL;
+	
+	SaveFile : FB_SaveToFile;
+END_VAR
+
+
+VAR_INPUT
+	tempSize: UINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF firstCycle THEN
+	tempSize := SIZEOF(bufferMemory);
+	ringBuffer( pBuffer := ADR(bufferMemory), cbBuffer := SIZEOF(bufferMemory), bOverwrite := TRUE );
+	firstCycle := FALSE;
+	RETURN;
+END_IF
+
+logger.M_Cyclic();
+
+IF NOT logger.busy THEN
+	IF bLog THEN
+		logger.pData := 'This is a test sting"';
+		logger.pExecute := TRUE;	
+	END_IF
+ELSE
+	bLog := FALSE; // Reset trigger
+	logger.pExecute := FALSE;		
+END_IF
+
+IF logger.error THEN
+	bLog := FALSE; // Reset trigger
+	logger.pExecute := FALSE;	
+END_IF
+
+M_CyclicLogic();]]></ST>
+    </Implementation>
+    <Method Name="M_AddSysLog" Id="{69157b46-8c1b-4697-b344-3c710f9c259e}">
+      <Declaration><![CDATA[METHOD PUBLIC M_AddSysLog : BOOL
+
+VAR_INPUT
+    severity : INT;
+    message : STRING;
+END_VAR
+
+VAR
+    logEntry : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Concatenate severity and message
+logEntry := CONCAT('Severity ', INT_TO_STRING(severity));
+logEntry := CONCAT(logEntry, ': ');
+logEntry := CONCAT(logEntry, message);
+
+// Add log entry to ring buffer
+ringBuffer.A_AddTail(putValue := logEntry);
+IF NOT ringbuffer.bOk THEN
+	// Handle write error (optional)END_IF;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_CyclicLogic" Id="{e2f72ec9-97bb-4de5-940f-234d15cb6a27}">
+      <Declaration><![CDATA[METHOD M_CyclicLogic : BOOL
+
+
+VAR
+	bufferFillPercentage: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[exportTimer(IN := TRUE, PT := exportInterval);
+bufferFillPercentage := (ringBuffer.cbSize * 100) / SIZEOF(bufferMemory);
+
+IF exportTimer.Q OR (bufferFillPercentage > 50) THEN
+	M_WriteToFile(); // Export logs when conditions are met
+	exportTimer(IN := FALSE); // Reset timer
+END_IF;
+
+ringBuffer();
+
+SaveFile.M_Cyclic();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_WriteToFile" Id="{53ac3c7d-69ee-4a81-bb08-5f65a43a7acb}">
+      <Declaration><![CDATA[METHOD M_WriteToFile : BOOL
+VAR
+	data : STRING(255);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SaveFile.pData := data := ringBuffer.A_RemoveHead();
+SaveFile.pExecute := TRUE;
+WRITETOFILE := FALSE;;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

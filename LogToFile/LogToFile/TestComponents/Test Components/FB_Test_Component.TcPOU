@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Test_Component" Id="{80924ee2-d833-4cc9-a197-975646d7a2bc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Test_Component EXTENDS FB_FCSLComponentBase IMPLEMENTS I_TestComponent
+
+VAR
+	_trig : BOOL;
+	Trig : R_TRIG;
+END_VAR
+
+VAR
+	// Inputs
+	MyInput AT %I* : BOOL;
+
+	// Outputs
+	MyOutput AT %Q* : BOOL;
+
+	// HMI
+//	MyComponent_HMI			: ST_ComponentMyComponent_HMI;
+//	HMICommandDescendant_RT : R_TRIG;
+
+	// Alarms
+//	MyComponentAlarms : ARRAY[1..MY_COMPONENT_ALARMS_COUNT] OF FB_TcAlarm;
+
+	// Internal variables
+//	_MyVarProperty1 : BOOL;
+//	_MyVarProperty2 : BOOL;
+//	MyVarInternal1	: BOOL;
+//	MyVarInternal2	: BOOL;
+
+	//MyCommandFb		: MyCommandFB;// Command FB to execute something e.g. MC_MoveAbsolute
+END_VAR
+
+VAR CONSTANT
+//	MY_COMPONENT_ALARMS_COUNT : UDINT := 2;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// NO CODE HERE!!! ]]></ST>
+    </Implementation>
+    <Folder Name="I_CyclicLogic" Id="{949d3941-c769-4ef9-9270-365ad2e53f9d}" />
+    <Folder Name="Methods" Id="{785d2a36-efb8-4cbd-9276-380be6e85a49}" />
+    <Method Name="CyclicLogic" Id="{1d14c55b-7a16-4bb6-af0b-ba890cf004a4}" FolderPath="I_CyclicLogic\">
+      <Declaration><![CDATA[//! @summary Basic component initialization logic
+METHOD CyclicLogic
+
+//! @description This method is called by <c>CyclicLogic()</c> as required
+//! @description This method should be called cyclically by descendant function blocks by invoking <c>SUPER^.CyclicLogic()</c>. 
+// Alternatively, the contents of this method could be reimplemented entirely in which case a call to this method would not be necessary.
+
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT _InitComplete THEN
+	_InitComplete := Initialize();
+	RETURN;
+END_IF
+
+//{error 'Programming instruction - Write your custom component cyclic cogic here'}
+
+Trig(CLK := _trig);
+
+IF Trig.Q THEN
+	M_SysLog(msg := CONCAT(Name, ' : Has being triggered'), debug := E_LogDebugLevel.testing);
+//M_SysLog(msg := CONCAT(Name, ' : input has being triggered during Test'), debug := E_LogDebugLevel.commissioning);
+(*	msg := CONCAT(Name, ' : input has being triggered during Commissioning');
+	M_SysLog(msg := msg, debug :=  E_LogDebugLevel.commissioning);
+	msg := CONCAT(Name, ' : input has being triggered during Production');
+	M_SysLog(msg := msg, debug :=  E_LogDebugLevel.production);*)
+END_IF
+
+(*
+	MyCommandFb();
+	IF MyCommandFB.Error THEN
+		_Error	 := TRUE;
+		_ErrorID := MyCommandFb.ErrorId;
+	END_IF
+	
+	MyCommandFB.Execute := FALSE;
+*)
+
+// Component Error
+//{error 'Programming instruction - Create component has error'}
+//_Error	 := TRUE;
+//_ErrorID := 9999;
+
+// Component Busy
+//{error 'Programming instruction - Create component is busy'}
+IF FALSE THEN
+	_Busy := TRUE;
+ELSE
+	_Busy := FALSE;
+END_IF
+
+// Call Super
+SUPER^.CyclicLogic();
+
+// Set Current Alarm Severity
+// _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := MyComponentAlarms, CurrentSeverity := _CurrentAlarmSeverity);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{f036e164-e0c3-48f7-be80-28e215b37540}" FolderPath="Methods\">
+      <Declaration><![CDATA[(*! @summary Basic component initialization logic*)
+METHOD PROTECTED Initialize : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// TODO : {error 'Programming instruction - Add code to initialize your Component'}
+
+M_SysLog(msg := CONCAT(Name, ' : Has being initalized'), debug := E_LogDebugLevel.production);
+
+// Call Super
+Initialize := Super^.Initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="pTrig" Id="{6000d349-0d03-40cb-ae39-d4afc417b620}">
+      <Declaration><![CDATA[PROPERTY pTrig : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9029c822-5889-40b9-a98b-b42ee0c4ef21}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[pTrig := _trig;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{31a903c1-e28c-4057-a4d5-690594455fca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_trig := pTrig;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

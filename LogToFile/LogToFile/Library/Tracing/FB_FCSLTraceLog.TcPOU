@@ -1,0 +1,317 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_FCSLTraceLog" Id="{d220da4d-4c63-430e-9504-bb591ec9ab64}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FCSLTraceLog
+VAR
+	Event						 : FB_TcMessage;
+	JsonParser					 : FB_JsonDomParser;
+	ExParser 				 : FB_JsonDomParser;
+	TimeFormatter				 : FB_FormatString;
+	MessagesSentThisScan		 : UDINT;
+	Previous_AddEntrySource		 : T_MaxString;
+	Previous_AddEntryMessage	 : T_MaxString;
+	Previous_AddEntryFlags		 : UDINT;
+	Previous_AddEntryJsonSource	 : T_MaxString;
+	Previous_AddEntryJsonMessage : T_MaxString;
+	Previous_AddEntryJsonFlags	 : UDINT;
+	Previous_AddEntryJson		 : T_MaxString;
+	InitComplete				 : BOOL := FALSE;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{69643a7d-e4e5-42a3-9a2d-195dbc685e06}">
+      <Declaration><![CDATA[//FB_Init is always available implicitly and it is used primarily for initialization.
+//The return value is not evaluated. For a specific influence, you can also declare the
+//methods explicitly and provide additional code there with the standard initialization
+//code. You can evaluate the return value.
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: the retain variables are initialized (reset warm / reset cold)
+    bInCopyCode: BOOL;  // TRUE: the instance will be copied to the copy code afterward (online change)   
+END_VAR
+
+
+VAR
+	hr : HRESULT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[{analysis -15}
+IF NOT Event.EqualsToEventEntryEx(TC_EVENTS.Tracing.TraceEvent) THEN
+	IF SUCCEEDED(Event.CreateEx(TC_EVENTS.Tracing.TraceEvent, 0)) THEN
+		InitComplete := TRUE;
+	END_IF
+ELSE
+	InitComplete := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_AddContext" Id="{2cc3dc64-e45f-4229-aaf9-efb1017803dc}">
+      <Declaration><![CDATA[METHOD PRIVATE M_AddContext
+
+VAR_INPUT
+	Json : SJsonValue;
+	Message : REFERENCE TO T_MaxString;
+	logType : E_LogType;
+	Source : STRING;
+	Flags  : UDINT;
+END_VAR
+
+VAR
+	// Time 
+	CurrentDCTime : DCTIMESTRUCT;
+	Task : T_MaxString;
+	CycleCount : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Collect Properties
+CurrentDCTime := DCTIME64_TO_DCTIMESTRUCT(F_GetActualDcTime64());
+TimeFormatter(
+    sFormat := '%2.2d:%2.2d:%2.2d.%3.3d%3.3d',
+    arg1    := F_WORD(CurrentDCTime.wHour),
+    arg2    := F_WORD(CurrentDCTime.wMinute),
+    arg3    := F_WORD(CurrentDCTime.wSecond),
+    arg4    := F_WORD(CurrentDCTime.wMilliseconds),
+    arg5    := F_WORD(CurrentDCTime.wMicroseconds),	
+    bError  => ,    // If there's a formatting error, this is TRUE
+    nErrId  =>      // Error ID if bError=TRUE
+);		
+Task := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].TaskName;
+CycleCount := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].CycleCount;
+
+Event.ipArguments.Clear().AddString(Message);
+
+// Pass properties to Json extnsion for logging.
+JsonParser.AddStringMember(Json, 'Timestamp', TimeFormatter.sOut);
+JsonParser.AddStringMember(Json, 'Message', Message);
+JsonParser.AddUIntMember(Json, 'logType', logType);
+JsonParser.AddStringMember(Json, 'Source', Source);
+JsonParser.AddStringMember(Json, 'Context', Task);
+JsonParser.AddUint64Member(Json, 'ScanCount', CycleCount);
+JsonParser.AddUint64Member(Json, 'Flags', Flags);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_AddEntry" Id="{3a21502d-ccdb-4fe9-ba91-818c33927cdc}">
+      <Declaration><![CDATA[METHOD M_AddEntry : BOOL
+VAR_INPUT
+	Source	: T_MaxString;
+	Message : T_MaxString;
+	logType : E_LogType;
+	Flags	: UDINT;
+END_VAR
+
+VAR
+	Document	  : SJsonValue;
+	JsonAttribute : T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT InitComplete THEN
+	RETURN;
+END_IF
+
+{analysis -62}
+IF NOT pTracingAllowed THEN
+	{analysis -90}
+	RETURN;
+END_IF
+
+IF NOT Parameters_Tracing.ALLOW_DUPLICATE_SEQUENTIAL_MESSAGES THEN
+	IF (Source = Previous_AddEntrySource) AND (Message = Previous_AddEntryMessage) AND (Flags = Previous_AddEntryFlags) THEN
+		//This message is identical to the last message sent--ignore
+		RETURN;
+	END_IF
+END_IF
+
+// Create JSON, add Context and add to Event
+Document := JsonParser.NewDocument();
+M_AddContext(JSON := Document, Message := Message, logType := logType, Source := Source, Flags := Flags);
+JsonAttribute := JsonParser.GetJson(Document);
+Event.SetJsonAttribute(JsonAttribute);
+
+// Send Event
+Event.Send(0);
+
+
+// Tidy up
+MessagesSentThisScan := MessagesSentThisScan + 1;
+MEMSET(ADR(Previous_AddEntrySource), 0, SIZEOF(T_MaxString));
+MEMSET(ADR(Previous_AddEntryMessage), 0, SIZEOF(T_MaxString));
+Previous_AddEntrySource	 := Source;
+Previous_AddEntryMessage := Message;
+Previous_AddEntryFlags	 := Flags;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_AddEntryWithJson" Id="{801d50fa-e161-4bc8-b290-e72cd202cc73}">
+      <Declaration><![CDATA[METHOD M_AddEntryWithJson : BOOL
+VAR_INPUT
+	Source	: T_MaxString;
+	Message : T_MaxString;
+	logType : E_LogType;
+	Flags	: UDINT;
+	Json	: T_MaxString;
+END_VAR
+
+VAR
+	Document	  : SJsonValue;
+	JsonAttribute : T_MaxString;
+	TaskName	  : T_MaxString;
+	temp		  : UDINT;
+	ExtendedInfo  : FB_JsonDomParser;
+END_VAR
+
+VAR_INST
+	LastScanCount		 : UDINT;
+	MessagesSentThisScan : UDINT;
+	MissedMessages		 : UDINT;
+	Throttled			 : BOOL;
+END_VAR
+
+VAR
+	ThrottledNotificationString : T_MaxString;
+	CurrentDCTime				: DCTIMESTRUCT;
+	DCTime100Nsec				: WORD;
+	DCTimeString				: T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT InitComplete THEN
+	RETURN;
+END_IF
+
+{analysis -62}
+IF NOT pTracingAllowed THEN
+	RETURN;
+END_IF
+
+IF NOT Parameters_Tracing.ALLOW_DUPLICATE_SEQUENTIAL_MESSAGES THEN
+	IF (MEMCMP(ADR(Source), ADR(Previous_AddEntryJsonSource), SIZEOF(T_MaxString)) = 0) AND (MEMCMP(ADR(Message), ADR(Previous_AddEntryJsonMessage), SIZEOF(T_MaxString)) = 0) AND (Flags = Previous_AddEntryJsonFlags) AND (MEMCMP(ADR(Json), ADR(Previous_AddEntryJson), SIZEOF(T_MaxString)) = 0) THEN
+		//This message is identical to the last message sent--ignore
+		RETURN;
+	END_IF
+END_IF
+
+Document := JsonParser.NewDocument();
+M_AddContext(JSON := Document, Message := Message, logType := logType, Source := Source, Flags := Flags);
+M_AddExtension(JSON := Document, Data := Json);
+//JsonParser.AddStringMember(Document, 'ExtendedInfo', Json);
+//JsonParser.AddJsonMember(Document, 'ExtendedInfo', Json);
+
+JsonAttribute := JsonParser.GetJson(Document);
+Event.SetJsonAttribute(JsonAttribute);
+Event.Send(0);
+
+// Tidy up
+MessagesSentThisScan := MessagesSentThisScan + 1;
+MEMSET(ADR(Previous_AddEntrySource), 0, SIZEOF(T_MaxString));
+MEMSET(ADR(Previous_AddEntryMessage), 0, SIZEOF(T_MaxString));
+Previous_AddEntrySource	 := Source;
+Previous_AddEntryMessage := Message;
+Previous_AddEntryFlags	 := Flags;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_AddExtension" Id="{ab4fa6b4-3284-42b2-8906-7e7efcc7ba5f}">
+      <Declaration><![CDATA[METHOD M_AddExtension : BOOL
+
+VAR_INPUT
+    Json : SJsonValue;
+    Data : T_MaxString;
+END_VAR
+
+VAR
+    jsonDoc        : SJsonValue;
+    jsonIterator   : SJsonIterator;
+    jsonIteratorEnd: SJsonIterator;
+    sName          : STRING(255);
+    jsonValue      : LWORD;
+    sString        : STRING(1024);  // Increased buffer size for JSON content
+    extendedInfoRef: SJsonValue;
+    memberRef      : LWORD;
+
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Parse the JSON string into ExParser
+jsonDoc         := ExParser.ParseDocument(Data);
+jsonIterator    := ExParser.MemberBegin(jsonDoc);
+jsonIteratorEnd := ExParser.MemberEnd(jsonDoc);
+
+// Ensure 'ExtendedInfo' exists, otherwise create it
+IF NOT JsonParser.HasMember(Json, 'ExtendedInfo') THEN
+    JsonParser.AddObjectMember(Json, 'ExtendedInfo');
+END_IF
+
+// Get reference to the 'ExtendedInfo' object
+extendedInfoRef := JsonParser.FindMember(Json, 'ExtendedInfo');
+
+// Iterate through JSON members and add them individually to 'ExtendedInfo'
+WHILE jsonIterator <> jsonIteratorEnd DO
+	sName         := ExParser.GetMemberName(jsonIterator);
+	jsonValue     := ExParser.GetMemberValue(jsonIterator);
+	ExParser.CopyJson(jsonValue, sString, SIZEOF(sString));
+
+   // Remove leading and trailing quotes if present
+    IF (LEFT(sString, 1) = '"') AND (RIGHT(sString, 1) = '"') THEN
+        sString := DELETE(sString, 1, 1);  // Remove first quote
+        sString := DELETE(sString, 1, LEN(sString));  // Remove last quote
+    END_IF
+  
+ 	JsonParser.AddJsonMember(extendedInfoRef, sName, sString);
+  
+    jsonIterator := ExParser.NextMember(jsonIterator);
+END_WHILE
+
+M_AddExtension := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="pTracingAllowed" Id="{fbceb28c-262e-4c93-85b5-1faca173531f}">
+      <Declaration><![CDATA[PROPERTY pTracingAllowed : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2e46f83a-28ff-4b7f-b4aa-7e5c2061b3a2}">
+        <Declaration><![CDATA[VAR_INST
+	LastScanCount  : UDINT;
+	MissedMessages : UDINT;
+	Throttled	   : BOOL;
+END_VAR
+
+VAR
+	ThrottledNotificationString : T_MaxString;
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[{analysis -62}
+IF NOT Parameters_Tracing.TRACING_ENABLED THEN
+	pTracingAllowed := FALSE;
+	RETURN;
+END_IF
+
+IF TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].CycleCount = LastScanCount THEN
+	//Trying to send multiple messages in same scan
+	IF Throttled THEN
+		MissedMessages := MissedMessages + 1;
+		RETURN;
+	ELSIF MessagesSentThisScan >= Parameters_Tracing.MAX_LOG_ENTRIES_PER_SCAN AND NOT Throttled THEN
+		//Need to throttle messsage queue
+		Event.ipArguments.Clear().AddString('Too many messages sent in single scan; tracing throttled.');
+		Event.Send(0);
+		MissedMessages := MissedMessages + 1;
+		Throttled	   := TRUE;
+		pTracingAllowed := FALSE;
+		RETURN;
+	ELSE
+		pTracingAllowed := TRUE;
+	END_IF
+ELSE
+	IF Throttled THEN
+		ThrottledNotificationString := CONCAT('Missed ', CONCAT(TO_STRING(MissedMessages), ' throttled messages previously.'));
+		Event.ipArguments.Clear().AddString(ThrottledNotificationString);
+		Event.Send(0);
+		MissedMessages := 0;
+	END_IF
+
+	LastScanCount		 := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].CycleCount;
+	MessagesSentThisScan := 0;
+	Throttled			 := FALSE;
+	pTracingAllowed		 := TRUE;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

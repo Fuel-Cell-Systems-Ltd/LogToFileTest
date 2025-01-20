@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="PRG_TestComponents" Id="{31b2772e-2b0b-45e6-a2be-c8f1d02a4d59}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_TestComponents
+VAR
+	// Interfaces
+	iComponent1, iComponet2 : I_TestComponent;	
+
+	// Componentes
+	Component_1 : FB_Test_Component := (Name := 'TC-01');
+	Component_2 : FB_Test_Component := (Name := 'TC-02');
+
+	// Test Triggers
+	Trig1, Trig2 : BOOL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[M_Map();]]></ST>
+    </Implementation>
+    <Method Name="M_Map" Id="{feb471fa-b931-4c00-80f4-b70de2e8d9bd}">
+      <Declaration><![CDATA[METHOD M_Map : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Map Interface
+iComponent1 := Component_1;
+iComponent1 := Component_2;
+
+// Map Parameters
+Component_1.pTrig := Trig1;
+Component_2.pTrig := Trig2;
+
+// Cylic Calls
+Component_1.CyclicLogic();
+Component_2.CyclicLogic();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

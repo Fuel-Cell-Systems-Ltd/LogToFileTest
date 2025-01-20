@@ -21,22 +21,65 @@
     <Compile Include="DUTs\E_Result.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\E_LogType.TcDUT">
+    <Compile Include="Library\Listener\FB_FCSLMessageListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\FB_Logger.TcPOU">
+    <Compile Include="Library\Listener\FB_FCSLTraceListenerBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\FB_SaveToFile.TcPOU">
+    <Compile Include="Library\Listener\I_FCSLTraceListener.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\I_Logger.TcIO">
+    <Compile Include="Library\Listener\ST_FCSLTraceMessage.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\PRG_Logging.TcPOU">
+    <Compile Include="Library\PRG_Log_Main.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logger\ST_LoggerSettings.TcDUT">
+    <Compile Include="Library\Tracing\E_LogDebugLevel.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Tracing\E_LogType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Tracing\FB_FCSLTraceLog.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Tracing\GVL_FCSLTracing.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="TestComponents\FB_FCSLComponentBase.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestComponents\F_CreateJSON.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestComponents\Test Components\FB_Test_Component.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestComponents\Test Components\I_TestComponent.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestComponents\Test Components\PRG_TestComponents.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\E_LogTransmittal.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\FB_Logger.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\FB_SaveToFile.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\I_Logger.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\PRG_Logging.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogToFile\ST_LoggerSettings.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PlcTask.TcTTO">
@@ -51,11 +94,27 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
-    <Folder Include="Logger" />
-    <Folder Include="VISUs" />
+    <Folder Include="Library\Listener" />
+    <Folder Include="Library\Tracing" />
+    <Folder Include="TestComponents\Test Components" />
+    <Folder Include="LogToFile" />
+    <Folder Include="TestComponents" />
+    <Folder Include="Library" />
     <Folder Include="POUs" />
   </ItemGroup>
   <ItemGroup>
+    <PlaceholderReference Include="SPT Base Types">
+      <DefaultResolution>SPT Base Types, * (Beckhoff Automation LLC)</DefaultResolution>
+      <Namespace>SPT_BaseTypes</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="SPT Components">
+      <DefaultResolution>SPT Components, * (Beckhoff Automation LLC)</DefaultResolution>
+      <Namespace>SPT_Components</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_EtherCAT">
+      <DefaultResolution>Tc2_EtherCAT, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_EtherCAT</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_Standard</Namespace>
@@ -72,6 +131,14 @@
       <DefaultResolution>Tc3_BA_Common, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_BA_Common</Namespace>
     </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_EventLogger">
+      <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_EventLogger</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_JsonXml">
+      <DefaultResolution>Tc3_JsonXml, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_JsonXml</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
@@ -86,8 +153,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -154,14 +221,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>
