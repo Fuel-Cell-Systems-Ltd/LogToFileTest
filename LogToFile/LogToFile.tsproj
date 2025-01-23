@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.64">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53">
 	<Project ProjectGUID="{98646747-5D6C-4854-8A16-71B80CBE6F13}" Target64Bit="true" AutoPrioManagement="true" ShowHideConfigurations="#x6">
 		<System>
 			<Settings MaxCpus="16" NonWinCpus="1">
@@ -17,7 +17,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{96161287-A33F-4BB6-BAB2-5B548564D5FC}" Name="LogToFile" PrjFilePath="LogToFile\LogToFile.plcproj" TmcFilePath="LogToFile\LogToFile.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="LogToFile\LogToFile.tmc" TmcHash="{0B1B66BD-E1E0-8642-F433-90C8A8AC90EB}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="LogToFile\LogToFile.tmc" TmcHash="{39338CDE-032B-B03C-B061-638D279F6A86}">
 					<Name>LogToFile Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">

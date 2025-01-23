@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_LogToFile" Id="{fb5295cb-b1f0-49d5-9615-1a2a01ed1744}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_LogToFile EXTENDS FB_CyclicFB
+
+VAR CONSTANT
+	LOG_SETTINGS : ST_LoggerSettings := (netID := '', filePath := 'C:\Logs\', filePrefix := 'SystemApp_', FileType := '.txt');	
+	LOG_TIMEOUT : TIME := T#5S;
+	NEW_LINE : STRING(2) := '$r$n'; // Newline character
+END_VAR
+
+VAR
+	bLog : BOOL := FALSE; // Trigger to log data
+
+    ringBuffer : FB_StringRingBuffer;
+    bufferMemory : ARRAY[0..5000] OF BYTE; // Adjust size as needed
+    lastExportTime : TIME := T#0S;
+    exportInterval : TIME := T#10S; // Export interval (1 second)
+    fileLoggerBusy : BOOL := FALSE;
+	
+	firstCycle : BOOL := TRUE;
+	exportTimer: TON;
+	
+	// From FB_init
+    _netId 	 : T_AmsNetId;     // Net ID for file operations
+    _dirPath : T_MaxString;    // Directory path for the log file
+	_logPrefix  : STRING(10);     // Prefix for log file
+	_fileExtension : STRING(10);  // File extension i.e. '.txt'
+	_TimeOut : TIME := DEFAULT_ADS_TIMEOUT;
+
+// Params
+	_execute : BOOL := FALSE; // Trigger for the log operation
+    _data 	 : T_MaxString; // Log entry to write
+
+// Internal
+	state : (IDLE, PREPARE_DATA, OPEN_FILE, WRITE_TO_FILE, CLOSE_FILE, RESET);
+
+    fileOpen  : FB_FileOpen;
+    fileClose : FB_FileClose;
+    fileWrite : FB_FileWrite;
+
+	fileRef : UINT := 0;       	// File handle
+
+    risingEdge : R_TRIG;     // Rising edge detector for execute signal
+END_VAR
+
+VAR_OUTPUT
+	smDone, smBusy, smError : BOOL;
+    errId : UDINT;	 // Error ID in case of failure
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="I_CyclicLogic" Id="{87daa978-67c6-4a39-86ac-3d294411fb43}" />
+    <Folder Name="Private" Id="{fc975c30-933a-4e62-908f-c6744c85109e}" />
+    <Method Name="CyclicLogic" Id="{927c198c-b88a-4c95-956a-748cb57237df}" FolderPath="I_CyclicLogic\">
+      <Declaration><![CDATA[METHOD CyclicLogic
+VAR
+	bufferFillPercentage: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF firstCycle THEN
+	ringBuffer( pBuffer := ADR(bufferMemory), cbBuffer := SIZEOF(bufferMemory), bOverwrite := TRUE );
+	firstCycle := FALSE;
+	RETURN;
+END_IF
+
+ringBuffer();
+
+exportTimer(IN := TRUE, PT := exportInterval);
+bufferFillPercentage := (ringBuffer.cbSize * 100) / SIZEOF(bufferMemory);
+
+IF ( ( exportTimer.Q  ) AND ( ringBuffer.nCount > 0 ) ) OR (bufferFillPercentage > 50) THEN
+	//M_WriteToFile(); // Export logs when conditions are met
+	_execute := TRUE;
+	exportTimer(IN := FALSE); // Reset timer
+ELSE
+	_execute := FALSE;
+END_IF;
+
+M_StateMachine();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{9777b847-b97e-4dff-ae75-c6e3eaac3d98}">
+      <Declaration><![CDATA[//FB_Init is always available implicitly and it is used primarily for initialization.
+//The return value is not evaluated. For a specific influence, you can also declare the
+//methods explicitly and provide additional code there with the standard initialization
+//code. You can evaluate the return value.
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: the retain variables are initialized (reset warm / reset cold)
+    bInCopyCode: BOOL;  // TRUE: the instance will be copied to the copy code afterward (online change)
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_netID := LOG_SETTINGS.netID;
+_dirPath := LOG_SETTINGS.filePath;
+_logPrefix := LOG_SETTINGS.filePrefix;
+_fileExtension := LOG_SETTINGS.FileType;
+_timeOut := LOG_TIMEOUT;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_AddSysLog" Id="{1b2fb357-e815-4ace-afb2-8f3df1c1dad2}">
+      <Declaration><![CDATA[METHOD PUBLIC M_AddSysLog : BOOL
+
+VAR_INPUT
+    severity : INT;
+    message : STRING;
+END_VAR
+
+VAR
+    logEntry : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Concatenate severity and message
+logEntry := CONCAT('Severity ', INT_TO_STRING(severity));
+logEntry := CONCAT(logEntry, ': ');
+logEntry := CONCAT(logEntry, message);
+
+// Add log entry to ring buffer
+ringBuffer.A_AddTail(putValue := logEntry);
+IF NOT ringbuffer.bOk THEN
+	// Handle write error (optional)END_IF;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_CloseFile" Id="{d38a4b35-b3a5-43ee-bd0d-254ea85cb7ec}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE M_CloseFile : BOOL
+
+VAR_INPUT
+	execute : BOOL;	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_CloseFile := FALSE;
+	RETURN;
+END_IF
+
+IF NOT fileOpen.bBusy THEN     
+ fileClose(sNetId := _netId, hFile := fileRef, tTimeout := _timeOut);
+END_IF
+
+// Attempt to close the file
+fileClose(bExecute := TRUE);
+
+IF NOT M_HandleError(fileClose.bError , fileClose.nErrId) THEN
+	fileRef := 0; // File handle
+END_IF
+
+M_CloseFile := fileClose.bBusy;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_HandleError" Id="{78e24d16-4370-48ca-b07a-c9807c919296}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE M_HandleError : BOOL
+VAR_INPUT
+	check : BOOL;
+	errorID : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF check THEN
+	 smError := TRUE;
+     errId := errorID;
+ELSE
+	 smError := FALSE;;
+END_IF
+
+M_HandleError := check;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_OpenFile" Id="{265e6e42-3b42-4497-9b62-d63a0adb2967}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE M_OpenFile : BOOL
+
+VAR_INPUT
+	execute : BOOL;	
+END_VAR
+
+VAR
+	getSystemTime : GETSYSTEMTIME; // System time function block
+	fileTime : T_FILETIME;     // File time
+	dateString : STRING;		// Date string for filename
+	filePath : STRING; 	// Full log file path
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_OpenFile := FALSE;
+	RETURN;
+END_IF
+
+IF _dirPath = '' THEN
+   	M_HandleError(TRUE , 99);
+	M_OpenFile := FALSE;
+    RETURN;
+END_IF
+
+IF NOT fileOpen.bBusy THEN
+	// Generate log file path with current date
+	getSystemTime(timeLoDW => fileTime.dwLowDateTime, timeHiDW => fileTime.dwHighDateTime );
+	dateString := SYSTEMTIME_TO_STRING(FILETIME_TO_SYSTEMTIME(fileTime));
+	filepath := CONCAT(_dirPath, _logPrefix); 			// Create file path
+	filePath := CONCAT(filepath, LEFT(dateString, 10)); // Add date to file path
+	filePath := CONCAT(filepath, _fileExtension); 		// Add file extension to file path.
+     
+	fileOpen(sNetId := '', sPathName := filePath, nMode := FOPEN_MODEAPPEND, ePath := PATH_GENERIC, tTimeout := _timeOut);
+END_IF
+
+// Attempt to open the file
+fileOpen(bExecute := TRUE);
+
+IF NOT M_HandleError(fileOpen.bError , fileOpen.nErrId) THEN
+	fileRef := fileOpen.hFile; // File handle
+END_IF
+
+M_OpenFile := fileOpen.bBusy;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_StateMachine" Id="{2fa36e72-1bf8-451a-8c2e-ff84f03be0d5}">
+      <Declaration><![CDATA[METHOD M_StateMachine
+
+VAR
+	status: BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[RisingEdge(CLK := _execute);
+
+CASE state OF
+    IDLE: // Idle state
+        IF RisingEdge.Q THEN
+			smDone := FALSE;
+           	smBusy := TRUE;
+            smError := FALSE;
+            errId := 0;
+		
+			fileOpen(bExecute := FALSE);
+			fileWrite(bExecute := FALSE);
+			fileClose(bExecute := FALSE);
+
+            state := OPEN_FILE;
+        END_IF
+
+    OPEN_FILE: // Open the file
+        status := M_OpenFile(TRUE);
+        IF error THEN
+			state := CLOSE_FILE;
+        ELSIF ( fileRef <> 0 ) AND ( NOT status ) THEN
+			M_OpenFile(FALSE);
+			state := WRITE_TO_FILE;
+        END_IF
+		
+	PREPARE_DATA:
+		ringBuffer.A_RemoveHead();
+		_data := ringBuffer.getValue;
+		
+		IF ( _data <> '' ) THEN
+			state := WRITE_TO_FILE;
+		ELSE
+			state := CLOSE_FILE;
+		END_IF
+
+    WRITE_TO_FILE: // Write to the file
+        status := M_WriteToFile(execute := TRUE, inputString := _data);
+        IF error  OR ( NOT status ) THEN
+			M_WriteToFile(FALSE, '');
+			state := PREPARE_DATA;
+        END_IF
+
+    CLOSE_FILE: // Close the file
+       IF fileREF <> 0 THEN
+			status :=  M_CloseFile(TRUE);
+			IF error OR ( NOT status ) THEN
+				M_CloseFile(FALSE);
+				state := RESET;
+        	END_IF
+		ELSE
+			M_CloseFile(FALSE);
+			state := RESET;
+	   END_IF
+
+    RESET: // Cleanup and reset
+		smDone := TRUE;
+		smBusy := FALSE;
+        fileRef := 0;;
+        state := IDLE; // Return to idle state
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_WriteToFile" Id="{647db4ea-59c0-40ef-8b79-062cf0a303c0}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE M_WriteToFile : BOOL
+
+VAR_INPUT
+	execute : BOOL;
+	inputString : STRING; // Log entry to write
+END_VAR
+
+ VAR
+	msgString : STRING;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT execute THEN
+	fileOpen(bExecute := FALSE);
+	M_WriteToFile := FALSE;
+	RETURN;
+END_IF
+
+IF LEN(inputString) > (SIZEOF(msgString) - LEN(NEW_LINE)) THEN
+	M_HandleError( TRUE, 98);
+    M_WriteToFile := FALSE;
+	RETURN;
+END_IF
+
+IF NOT fileWrite.bBusy THEN
+	// Prepare the message with a newline
+	msgString := CONCAT(NEW_LINE, inputString);
+
+	// Write the message to the file
+	fileWrite(sNetId := _netId, hFile := fileRef, pWriteBuff := ADR(msgString), cbWriteLen := LEN(msgString), tTimeout := +_timeOut);
+END_IF
+
+// Attempt to write the file
+fileWrite(bExecute := TRUE);
+
+IF NOT M_HandleError(fileWrite.bError , fileWrite.nErrId) THEN
+	fileRef := fileOpen.hFile; // File handle
+END_IF
+
+M_WriteToFile := fileWrite.bBusy;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_LogToFile">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.CyclicLogic">
+      <LineId Id="8" Count="12" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.FB_init">
+      <LineId Id="19" Count="3" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_AddSysLog">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_CloseFile">
+      <LineId Id="3" Count="16" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_HandleError">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_OpenFile">
+      <LineId Id="3" Count="29" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_StateMachine">
+      <LineId Id="6" Count="24" />
+      <LineId Id="60" Count="1" />
+      <LineId Id="63" Count="2" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="31" Count="20" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="53" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_WriteToFile">
+      <LineId Id="3" Count="26" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
