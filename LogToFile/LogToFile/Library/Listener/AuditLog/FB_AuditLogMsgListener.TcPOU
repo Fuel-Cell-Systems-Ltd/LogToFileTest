@@ -3,14 +3,14 @@
   <POU Name="FB_AuditLogMsgListener" Id="{6945bf52-10c7-470f-b1f8-70ecbd6df5ae}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK  FB_AuditLogMsgListener  EXTENDS FB_ListenerBase2
 VAR
-    Json          : FB_JsonDomParser; 		//Parse JSON attribute of messages
-    JsonAttribute : STRING(10000);    		//Holds JSON attribute
-    hr            : HRESULT;         		//Signals JSON attribute was successfully read
-    ipListener    : I_AuditLogListener; 	//Receives callback once message is processed
+    json          			: FB_JsonDomParser; 		//Parse JSON attribute of messages
+    jsonAttribute 			: STRING(10000);    		//Holds JSON attribute
+    hr           			: HRESULT;         		//Signals JSON attribute was successfully read
+    ipListener    			: I_AuditLogListener; 	//Receives callback once message is processed
 	
-	fbRequestEventText : FB_RequestEventText;
+	fbRequestEventText 		: FB_RequestEventText;
 	{attribute 'TcEncoding':='UTF-8'}
-	sLastMessageText : STRING;
+	sLastMessageText 		: STRING;
 	
 END_VAR
 ]]></Declaration>
@@ -31,41 +31,39 @@ END_VAR
     <Method Name="OnMessageSent" Id="{0b2b4dd6-4c85-4eff-b964-084debcf2dc7}">
       <Declaration><![CDATA[METHOD OnMessageSent : Tc3_EventLogger.HRESULT
 VAR_INPUT
-    fbEvent : REFERENCE TO FB_TcEvent;
+    fbEvent 			: REFERENCE TO FB_TcEvent;
 END_VAR
 
 VAR
-    Message      : ST_AuditLogMessages;
-    JsonDocument : SJsonValue;
-    JsonProperty : SJsonValue;
-	JsonExtendedInfo: SJsonValue;
+    message      		: ST_AuditLogMessages;
+    jsonDocument 		: SJsonValue;
+    jsonProperty 		: SJsonValue;
+	jsonExtendedInfo	: SJsonValue;
 	
-	bHasMember : BOOL;
-	
-	test: STRING(255);
+	bHasMember 			: BOOL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[hr := fbEvent.GetJsonAttribute(JsonAttribute, SIZEOF(JsonAttribute));
 
-IF SUCCEEDED(hr) THEN
-    JsonDocument := Json.ParseDocument(JsonAttribute);
+IF ( SUCCEEDED(hr) ) THEN
+    jsonDocument := json.ParseDocument(jsonAttribute);
 
-    IF Json.HasMember(JsonDocument, 'Timestamp') THEN
-        JsonProperty      := Json.FindMember(JsonDocument, 'Timestamp');
-        Message.Timestamp := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Timestamp') ) THEN
+        jsonProperty      := json.FindMember(jsonDocument, 'Timestamp');
+        message.Timestamp := json.GetString(jsonProperty);
     END_IF
 
-    IF Json.HasMember(JsonDocument, 'k') THEN
-        JsonProperty    := Json.FindMember(JsonDocument, 'k');
-        Message.k := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'k') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'k');
+        message.k := json.GetString(jsonProperty);
     END_IF
 	
-    IF Json.HasMember(JsonDocument, 'v') THEN
-        JsonProperty    := Json.FindMember(JsonDocument, 'v');
- 		Message.v := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'v') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'v');
+ 		message.v := json.GetString(jsonProperty);
     END_IF
 
-    IF ipListener <> 0 THEN
+    IF ( ipListener <> 0 ) THEN
         //Notify listener of message data
         ipListener.OnTraceReceived(Message);
     END_IF
@@ -74,5 +72,15 @@ END_IF
 OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in order to cancel the callbacks for this program cycle.)]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_AuditLogMsgListener">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AuditLogMsgListener.Listener.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AuditLogMsgListener.OnMessageSent">
+      <LineId Id="3" Count="25" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

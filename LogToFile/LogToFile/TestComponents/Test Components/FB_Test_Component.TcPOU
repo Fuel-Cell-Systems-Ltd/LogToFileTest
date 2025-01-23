@@ -111,7 +111,7 @@ METHOD PROTECTED Initialize : BOOL
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// TODO : {error 'Programming instruction - Add code to initialize your Component'}
-M_SysLog(msg := CONCAT(Name, ' : Has being initalized'), debug := E_SysLogLevel.production);
+//M_SysLog(msg := CONCAT(Name, ' : Has being initalized'), debug := E_SysLogLevel.production);
 
 // Call Super
 Initialize := Super^.Initialize();]]></ST>
@@ -155,5 +155,28 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <LineIds Name="FB_Test_Component">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.CyclicLogic">
+      <LineId Id="3" Count="48" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.Initialize">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.pTrig.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.pTrig.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.pTrig2.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.pTrig2.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

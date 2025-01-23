@@ -31,64 +31,64 @@ END_VAR
     <Method Name="OnMessageSent" Id="{46fa173d-841d-44a4-9b56-28528074126a}">
       <Declaration><![CDATA[METHOD OnMessageSent : Tc3_EventLogger.HRESULT
 VAR_INPUT
-    fbEvent : REFERENCE TO FB_TcEvent;
+    fbEvent 			: REFERENCE TO FB_TcEvent;
 END_VAR
 
 VAR
-    Message      : ST_SysLogMessages;
-    JsonDocument : SJsonValue;
-    JsonProperty : SJsonValue;
+    message      		: ST_SysLogMessages;
+    jsonDocument 		: SJsonValue;
+    jsonProperty 		: SJsonValue;
 	
-	bHasMember : BOOL;
+	hasMember 			: BOOL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[hr := fbEvent.GetJsonAttribute(JsonAttribute, SIZEOF(JsonAttribute));
 
-IF SUCCEEDED(hr) THEN
-    JsonDocument := Json.ParseDocument(JsonAttribute);
+IF ( SUCCEEDED(hr) ) THEN
+    jsonDocument := json.ParseDocument(JsonAttribute);
 
-    IF Json.HasMember(JsonDocument, 'Timestamp') THEN
-        JsonProperty      := Json.FindMember(JsonDocument, 'Timestamp');
-        Message.Timestamp := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Timestamp') ) THEN
+        jsonProperty      := json.FindMember(JsonDocument, 'Timestamp');
+        message.timestamp := json.GetString(JsonProperty);
     END_IF
 
-    IF Json.HasMember(JsonDocument, 'Message') THEN
-        JsonProperty    := Json.FindMember(JsonDocument, 'Message');
-        Message.Message := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Message') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'Message');
+        message.message := json.GetString(jsonProperty);
     END_IF
 	
-	IF Json.HasMember(JsonDocument, 'LogLevel') THEN
-        JsonProperty      := Json.FindMember(JsonDocument, 'LogLevel');
-        Message.LogLevel := Json.GetUint(JsonProperty);
+	IF ( json.HasMember(jsonDocument, 'LogLevel') ) THEN
+        jsonProperty      := json.FindMember(jsonDocument, 'LogLevel');
+        message.logLevel := json.GetUint(jsonProperty);
     END_IF
 	
-    IF Json.HasMember(JsonDocument, 'Source') THEN
-        JsonProperty   := Json.FindMember(JsonDocument, 'Source');
-        Message.Source := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Source') ) THEN
+        jsonProperty   := json.FindMember(jsonDocument, 'Source');
+        message.Source := json.GetString(jsonProperty);
     END_IF
 
-    IF Json.HasMember(JsonDocument, 'Context') THEN
-        JsonProperty    := Json.FindMember(JsonDocument, 'Context');
-        Message.Context := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Context') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'Context');
+        message.Context := json.GetString(jsonProperty);
     END_IF
 
-    IF Json.HasMember(JsonDocument, 'ScanCount') THEN
-        JsonProperty      := Json.FindMember(JsonDocument, 'ScanCount');
-        Message.ScanCount := Json.GetUint(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'ScanCount') ) THEN
+        jsonProperty      := json.FindMember(jsonDocument, 'ScanCount');
+        message.ScanCount := json.GetUint(jsonProperty);
     END_IF
 
-    IF Json.HasMember(JsonDocument, 'Flags') THEN
-        JsonProperty  := Json.FindMember(JsonDocument, 'Flags');
-        Message.Flags := Json.GetUint(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'Flags') ) THEN
+        jsonProperty  := json.FindMember(jsonDocument, 'Flags');
+        message.Flags := json.GetUint(jsonProperty);
     END_IF
 	
-    IF Json.HasMember(JsonDocument, 'ExtendedInfo') THEN
-        JsonProperty := Json.FindMember(JsonDocument, 'ExtendedInfo');
-        Message.Json := Json.GetString(JsonProperty);
+    IF ( json.HasMember(jsonDocument, 'ExtendedInfo') ) THEN
+        jsonProperty := json.FindMember(jsonDocument, 'ExtendedInfo');
+        message.Json := json.GetString(jsonProperty);
     END_IF
 
 
-    IF ipListener <> 0 THEN
+    IF ( ipListener <> 0 ) THEN
         //Notify listener of message data
         ipListener.OnTraceReceived(Message);
     END_IF
@@ -97,5 +97,15 @@ END_IF
 OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in order to cancel the callbacks for this program cycle.)]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_SysLogMsgListener">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLogMsgListener.Listener.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLogMsgListener.OnMessageSent">
+      <LineId Id="3" Count="51" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

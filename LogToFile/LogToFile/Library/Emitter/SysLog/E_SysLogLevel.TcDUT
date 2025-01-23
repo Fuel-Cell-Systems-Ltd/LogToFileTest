@@ -5,7 +5,7 @@
 {attribute 'to_string'}
 TYPE E_SysLogLevel :
 (
-	invlid := 0,
+	invalid := 0,
 	testing,
 	commissioning,
 	production

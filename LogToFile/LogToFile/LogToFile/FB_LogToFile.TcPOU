@@ -4,44 +4,39 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_LogToFile EXTENDS FB_CyclicFB
 
 VAR CONSTANT
-	LOG_SETTINGS : ST_LoggerSettings := (netID := '', filePath := 'C:\Logs\', filePrefix := 'SystemApp_', FileType := '.txt');	
-	LOG_TIMEOUT : TIME := T#5S;
-	NEW_LINE : STRING(2) := '$r$n'; // Newline character
+	LOG_SETTINGS 				: ST_LoggerSettings := (netID := '', filePath := 'C:\Logs\', filePrefix := 'SystemApp_', FileType := '.txt');	
+	LOG_TIMEOUT 				: TIME := T#5S;
+	EXPORT_INTERVAL				: TIME := T#10S;
+	NEW_LINE 					: STRING(2) := '$r$n'; // Newline character
 END_VAR
 
 VAR
-	bLog : BOOL := FALSE; // Trigger to log data
-
-    ringBuffer : FB_StringRingBuffer;
-    bufferMemory : ARRAY[0..5000] OF BYTE; // Adjust size as needed
-    lastExportTime : TIME := T#0S;
-    exportInterval : TIME := T#10S; // Export interval (1 second)
-    fileLoggerBusy : BOOL := FALSE;
+    ringBuffer 					: FB_StringRingBuffer;
+    bufferMemory 				: ARRAY[0..5000] OF BYTE; // Adjust size as needed
 	
-	firstCycle : BOOL := TRUE;
-	exportTimer: TON;
+	firstCycle 					: BOOL := TRUE;
+	exportTimer					: TON;
 	
 	// From FB_init
-    _netId 	 : T_AmsNetId;     // Net ID for file operations
-    _dirPath : T_MaxString;    // Directory path for the log file
-	_logPrefix  : STRING(10);     // Prefix for log file
-	_fileExtension : STRING(10);  // File extension i.e. '.txt'
-	_TimeOut : TIME := DEFAULT_ADS_TIMEOUT;
+    _netId 	 					: T_AmsNetId;     // Net ID for file operations
+    _dirPath 					: T_MaxString;    // Directory path for the log file
+	_logPrefix  				: STRING(10);     // Prefix for log file
+	_fileExtension 				: STRING(10);  // File extension i.e. '.txt'
+	_timeOut 					: TIME := DEFAULT_ADS_TIMEOUT;
 
 // Params
-	_execute : BOOL := FALSE; // Trigger for the log operation
-    _data 	 : T_MaxString; // Log entry to write
+	_execute 					: BOOL := FALSE; // Trigger for the log operation
+    _data 	 					: T_MaxString; // Log entry to write
 
 // Internal
-	state : (IDLE, PREPARE_DATA, OPEN_FILE, WRITE_TO_FILE, CLOSE_FILE, RESET);
+	state 						: E_LogToFile_State;
 
-    fileOpen  : FB_FileOpen;
-    fileClose : FB_FileClose;
-    fileWrite : FB_FileWrite;
+    fileOpen  					: FB_FileOpen;
+    fileClose 					: FB_FileClose;
+    fileWrite 					: FB_FileWrite;
 
-	fileRef : UINT := 0;       	// File handle
-
-    risingEdge : R_TRIG;     // Rising edge detector for execute signal
+	fileRef 					: UINT := 0;       	// File handle
+    risingEdge 					: R_TRIG;     // Rising edge detector for execute signal
 END_VAR
 
 VAR_OUTPUT
@@ -61,15 +56,16 @@ VAR
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF firstCycle THEN
+        <ST><![CDATA[IF ( firstCycle ) THEN
 	ringBuffer( pBuffer := ADR(bufferMemory), cbBuffer := SIZEOF(bufferMemory), bOverwrite := TRUE );
 	firstCycle := FALSE;
+	state := E_LogToFile_State.IDLE;
 	RETURN;
 END_IF
 
 ringBuffer();
 
-exportTimer(IN := TRUE, PT := exportInterval);
+exportTimer(IN := TRUE, PT := EXPORT_INTERVAL);
 bufferFillPercentage := (ringBuffer.cbSize * 100) / SIZEOF(bufferMemory);
 
 IF ( ( exportTimer.Q  ) AND ( ringBuffer.nCount > 0 ) ) OR (bufferFillPercentage > 50) THEN
@@ -120,7 +116,7 @@ logEntry := CONCAT(logEntry, message);
 
 // Add log entry to ring buffer
 ringBuffer.A_AddTail(putValue := logEntry);
-IF NOT ringbuffer.bOk THEN
+IF ( NOT ringbuffer.bOk ) THEN
 	// Handle write error (optional)END_IF;
 END_IF]]></ST>
       </Implementation>
@@ -132,20 +128,20 @@ VAR_INPUT
 	execute : BOOL;	
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT execute THEN
+        <ST><![CDATA[IF ( NOT execute ) THEN
 	fileOpen(bExecute := FALSE);
 	M_CloseFile := FALSE;
 	RETURN;
 END_IF
 
-IF NOT fileOpen.bBusy THEN     
- fileClose(sNetId := _netId, hFile := fileRef, tTimeout := _timeOut);
+IF ( NOT fileOpen.bBusy ) THEN     
+	fileClose(sNetId := _netId, hFile := fileRef, tTimeout := _timeOut);
 END_IF
 
 // Attempt to close the file
 fileClose(bExecute := TRUE);
 
-IF NOT M_HandleError(fileClose.bError , fileClose.nErrId) THEN
+IF ( NOT M_HandleError(fileClose.bError , fileClose.nErrId) ) THEN
 	fileRef := 0; // File handle
 END_IF
 
@@ -155,15 +151,14 @@ M_CloseFile := fileClose.bBusy;]]></ST>
     <Method Name="M_HandleError" Id="{78e24d16-4370-48ca-b07a-c9807c919296}" FolderPath="Private\">
       <Declaration><![CDATA[METHOD PRIVATE M_HandleError : BOOL
 VAR_INPUT
-	check : BOOL;
-	errorID : UDINT;
+	check 					: BOOL;
+	errorID 				: UDINT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF check THEN
-	 smError := TRUE;
-     errId := errorID;
-ELSE
-	 smError := FALSE;;
+        <ST><![CDATA[check := error;
+
+IF check THEN
+	errId := errorID;
 END_IF
 
 M_HandleError := check;]]></ST>
@@ -173,29 +168,29 @@ M_HandleError := check;]]></ST>
       <Declaration><![CDATA[METHOD PRIVATE M_OpenFile : BOOL
 
 VAR_INPUT
-	execute : BOOL;	
+	execute 				: BOOL;	
 END_VAR
 
 VAR
-	getSystemTime : GETSYSTEMTIME; // System time function block
-	fileTime : T_FILETIME;     // File time
-	dateString : STRING;		// Date string for filename
-	filePath : STRING; 	// Full log file path
+	getSystemTime 			: GETSYSTEMTIME; // System time function block
+	fileTime 				: T_FILETIME;     // File time
+	dateString 				: STRING;		// Date string for filename
+	filePath 				: STRING; 	// Full log file path
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT execute THEN
+        <ST><![CDATA[IF ( NOT execute ) THEN
 	fileOpen(bExecute := FALSE);
 	M_OpenFile := FALSE;
 	RETURN;
 END_IF
 
-IF _dirPath = '' THEN
+IF ( _dirPath = '' ) THEN
    	M_HandleError(TRUE , 99);
 	M_OpenFile := FALSE;
     RETURN;
 END_IF
 
-IF NOT fileOpen.bBusy THEN
+IF ( NOT fileOpen.bBusy ) THEN
 	// Generate log file path with current date
 	getSystemTime(timeLoDW => fileTime.dwLowDateTime, timeHiDW => fileTime.dwHighDateTime );
 	dateString := SYSTEMTIME_TO_STRING(FILETIME_TO_SYSTEMTIME(fileTime));
@@ -209,8 +204,8 @@ END_IF
 // Attempt to open the file
 fileOpen(bExecute := TRUE);
 
-IF NOT M_HandleError(fileOpen.bError , fileOpen.nErrId) THEN
-	fileRef := fileOpen.hFile; // File handle
+IF ( NOT M_HandleError(fileOpen.bError , fileOpen.nErrId) ) THEN
+	fileRef := fileOpen.hFile; // No error case
 END_IF
 
 M_OpenFile := fileOpen.bBusy;]]></ST>
@@ -220,14 +215,14 @@ M_OpenFile := fileOpen.bBusy;]]></ST>
       <Declaration><![CDATA[METHOD M_StateMachine
 
 VAR
-	status: BOOL;
+	status			: BOOL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[RisingEdge(CLK := _execute);
 
 CASE state OF
-    IDLE: // Idle state
-        IF RisingEdge.Q THEN
+    E_LogToFile_State.IDLE: // Idle state
+        IF ( RisingEdge.Q ) THEN
 			smDone := FALSE;
            	smBusy := TRUE;
             smError := FALSE;
@@ -237,54 +232,57 @@ CASE state OF
 			fileWrite(bExecute := FALSE);
 			fileClose(bExecute := FALSE);
 
-            state := OPEN_FILE;
+            state := E_LogToFile_State.OPEN_FILE;
         END_IF
 
-    OPEN_FILE: // Open the file
+    E_LogToFile_State.OPEN_FILE: // Open the file
         status := M_OpenFile(TRUE);
-        IF error THEN
-			state := CLOSE_FILE;
+		IF error THEN
+			state := E_LogToFile_State.CLOSE_FILE;
         ELSIF ( fileRef <> 0 ) AND ( NOT status ) THEN
 			M_OpenFile(FALSE);
-			state := WRITE_TO_FILE;
+			state := E_LogToFile_State.PREPARE_DATA;
         END_IF
 		
-	PREPARE_DATA:
+	E_LogToFile_State.PREPARE_DATA:
 		ringBuffer.A_RemoveHead();
 		_data := ringBuffer.getValue;
 		
 		IF ( _data <> '' ) THEN
-			state := WRITE_TO_FILE;
-		ELSE
-			state := CLOSE_FILE;
-		END_IF
-
-    WRITE_TO_FILE: // Write to the file
-        status := M_WriteToFile(execute := TRUE, inputString := _data);
-        IF error  OR ( NOT status ) THEN
 			M_WriteToFile(FALSE, '');
-			state := PREPARE_DATA;
-        END_IF
-
-    CLOSE_FILE: // Close the file
-       IF fileREF <> 0 THEN
+			state := E_LogToFile_State.WRITE_TO_FILE;
+		ELSE
+			IF ( NOT fileWrite.bBusy ) THEN
+				state := E_LogToFile_State.CLOSE_FILE;
+			END_IF
+		END_IF
+		
+    E_LogToFile_State.WRITE_TO_FILE: // Write to the file
+		status := M_WriteToFile(execute := TRUE, inputString := _data);
+		
+		IF ( NOT status ) THEN
+			state := E_LogToFile_State.PREPARE_DATA;
+		END_IF
+	
+    
+    E_LogToFile_State.CLOSE_FILE: // Close the file
+       IF ( fileREF <> 0 ) THEN
 			status :=  M_CloseFile(TRUE);
-			IF error OR ( NOT status ) THEN
+			IF ( error OR ( NOT fileWrite.bBusy ) ) THEN
 				M_CloseFile(FALSE);
-				state := RESET;
+				state := E_LogToFile_State.RESET;
         	END_IF
 		ELSE
 			M_CloseFile(FALSE);
-			state := RESET;
+			state := E_LogToFile_State.RESET;
 	   END_IF
 
-    RESET: // Cleanup and reset
+    E_LogToFile_State.RESET: // Cleanup and reset
 		smDone := TRUE;
 		smBusy := FALSE;
         fileRef := 0;;
-        state := IDLE; // Return to idle state
-END_CASE
-]]></ST>
+        state := E_LogToFile_State.IDLE; // Return to idle state
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="M_WriteToFile" Id="{647db4ea-59c0-40ef-8b79-062cf0a303c0}" FolderPath="Private\">
@@ -295,36 +293,38 @@ VAR_INPUT
 	inputString : STRING; // Log entry to write
 END_VAR
 
- VAR
+VAR
 	msgString : STRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT execute THEN
+        <ST><![CDATA[IF ( NOT execute ) THEN
 	fileOpen(bExecute := FALSE);
+	fileWrite(bExecute := FALSE);
 	M_WriteToFile := FALSE;
 	RETURN;
 END_IF
 
-IF LEN(inputString) > (SIZEOF(msgString) - LEN(NEW_LINE)) THEN
-	M_HandleError( TRUE, 98);
-    M_WriteToFile := FALSE;
-	RETURN;
-END_IF
+IF ( NOT fileWrite.bBusy ) THEN
+	
+	IF ( LEN(inputString) > (UINT_TO_INT(SIZEOF(msgString)) - LEN(NEW_LINE))) THEN
+		M_HandleError( TRUE, 98);
+		M_WriteToFile := FALSE;
+		RETURN;
+	END_IF
 
-IF NOT fileWrite.bBusy THEN
-	// Prepare the message with a newline
-	msgString := CONCAT(NEW_LINE, inputString);
+	msgString := CONCAT( inputString, NEW_LINE );
 
 	// Write the message to the file
-	fileWrite(sNetId := _netId, hFile := fileRef, pWriteBuff := ADR(msgString), cbWriteLen := LEN(msgString), tTimeout := +_timeOut);
+	fileWrite(sNetId := _netId, hFile := fileRef, pWriteBuff := ADR(msgString), cbWriteLen := INT_TO_UDINT(LEN(msgString)), tTimeout := +_timeOut);
 END_IF
 
 // Attempt to write the file
 fileWrite(bExecute := TRUE);
 
-IF NOT M_HandleError(fileWrite.bError , fileWrite.nErrId) THEN
-	fileRef := fileOpen.hFile; // File handle
+IF ( M_HandleError(fileWrite.bError , fileWrite.nErrId) ) THEN
+	M_WriteToFile := FALSE; // File handle
+	RETURN;
 END_IF
 
 M_WriteToFile := fileWrite.bBusy;]]></ST>
@@ -334,7 +334,9 @@ M_WriteToFile := fileWrite.bBusy;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.CyclicLogic">
-      <LineId Id="8" Count="12" />
+      <LineId Id="8" Count="2" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="11" Count="9" />
       <LineId Id="24" Count="0" />
       <LineId Id="21" Count="0" />
       <LineId Id="30" Count="1" />
@@ -351,11 +353,16 @@ M_WriteToFile := fileWrite.bBusy;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_CloseFile">
-      <LineId Id="3" Count="16" />
+      <LineId Id="3" Count="14" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="19" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_HandleError">
-      <LineId Id="3" Count="6" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="3" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="1" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_OpenFile">
@@ -363,19 +370,39 @@ M_WriteToFile := fileWrite.bBusy;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_StateMachine">
-      <LineId Id="6" Count="24" />
-      <LineId Id="60" Count="1" />
-      <LineId Id="63" Count="2" />
-      <LineId Id="68" Count="1" />
-      <LineId Id="71" Count="1" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="31" Count="20" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="53" Count="3" />
+      <LineId Id="202" Count="6" />
+      <LineId Id="300" Count="0" />
+      <LineId Id="210" Count="10" />
+      <LineId Id="289" Count="0" />
+      <LineId Id="222" Count="10" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="233" Count="1" />
+      <LineId Id="262" Count="2" />
+      <LineId Id="236" Count="2" />
+      <LineId Id="265" Count="0" />
+      <LineId Id="292" Count="0" />
+      <LineId Id="297" Count="0" />
+      <LineId Id="293" Count="1" />
+      <LineId Id="267" Count="0" />
+      <LineId Id="287" Count="0" />
+      <LineId Id="245" Count="12" />
+      <LineId Id="298" Count="1" />
+      <LineId Id="260" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_WriteToFile">
-      <LineId Id="3" Count="26" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="76" Count="1" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="140" Count="3" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="88" Count="9" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="98" Count="1" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

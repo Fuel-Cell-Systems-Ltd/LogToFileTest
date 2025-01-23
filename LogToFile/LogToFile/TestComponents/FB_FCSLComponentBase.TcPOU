@@ -27,17 +27,17 @@ M_AuditLog := S_OK;]]></ST>
       <Declaration><![CDATA[METHOD M_SysLog : HRESULT
 
 VAR_INPUT
-	msg : T_MaxString;
-	debug : E_SysLogLevel;
+	msg 			: T_MaxString;
+	debug 			: E_SysLogLevel;
 END_VAR
 
 VAR
-	debugString : STRING;
-	debugINT : UDINT;
-	json : T_MaxString;	
+	debugString 	: STRING;
+	debugINT 		: UDINT;
+	json 			: T_MaxString;	
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF debug = E_SysLogLevel.invlid THEN
+        <ST><![CDATA[IF ( debug = E_SysLogLevel.invalid ) THEN
 	RETURN;
 END_IF
 
@@ -53,5 +53,16 @@ GVL_FCSLTracing.sysLog.M_AddEntry(
 M_SysLog := S_OK;]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_FCSLComponentBase">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FCSLComponentBase.M_AuditLog">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FCSLComponentBase.M_SysLog">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

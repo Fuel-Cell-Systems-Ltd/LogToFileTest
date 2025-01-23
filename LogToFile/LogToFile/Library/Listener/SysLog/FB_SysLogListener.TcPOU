@@ -4,9 +4,9 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_SysLogListener EXTENDS FB_CyclicFB IMPLEMENTS I_SysLogListener
 
 VAR
-    MessageListener : FB_SysLogMsgListener;
+    messageListener 	: FB_SysLogMsgListener;
 	
-	logger : FB_Logger;
+	logger 				: FB_LogToFile;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -16,45 +16,45 @@ END_VAR
       <Declaration><![CDATA[METHOD CyclicLogic
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT _InitComplete THEN
-    _InitComplete := Initialize();
+        <ST><![CDATA[IF ( NOT _initComplete ) THEN
+    _initComplete := Initialize();
     RETURN;
 END_IF
 
-MessageListener.Execute();
+messageListener.Execute();
 
-Logger.CyclicLogic();]]></ST>
+logger.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{45325fa3-d6b5-4bf1-9a78-4cf32688947a}">
       <Declaration><![CDATA[METHOD Initialize : BOOL
 VAR
-    ListenerFilter : FB_TcEventFilter;
-    hr             : HRESULT;
+    listenerFilter 		: FB_TcEventFilter;
+    hr             		: HRESULT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[MessageListener.Listener := THIS^;                                   //For callbacks on message received
-ListenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.SysLog); //Filter events by tracing class
-hr := MessageListener.Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
-IF SUCCEEDED(hr) THEN
-    Initialize := TRUE;
+        <ST><![CDATA[messageListener.listener := THIS^;                                   //For callbacks on message received
+listenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.SysLog); //Filter events by tracing class
+hr := messageListener.Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
+IF ( SUCCEEDED(hr) ) THEN
+    initialize := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="OnTraceReceived" Id="{483f10e7-9961-485a-8b56-0155e3191c75}">
       <Declaration><![CDATA[METHOD OnTraceReceived
 VAR_INPUT
-    message : ST_SysLogMessages;
+    message 			: ST_SysLogMessages;
 END_VAR
 
 VAR
-	timestamp : T_MaxString;
-	msg   : T_MaxString;
-	logLevel  : E_SysLogLevel;
-	source    : T_MaxString;
-	context   : T_MaxString;
-	scanCount : UDINT;
-	flags     : UDINT;
+	timestamp 			: T_MaxString;
+	msg   				: T_MaxString;
+	logLevel  			: E_SysLogLevel;
+	source    			: T_MaxString;
+	context   			: T_MaxString;
+	scanCount 			: UDINT;
+	flags     			: UDINT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Extract relevant fields
@@ -66,7 +66,7 @@ context   := message.Context;
 scanCount := message.ScanCount;
 flags     := message.Flags;
 
-Logger.M_AddSysLog(1,msg);]]></ST>
+logger.M_AddSysLog(1,msg);]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_SysLogListener">

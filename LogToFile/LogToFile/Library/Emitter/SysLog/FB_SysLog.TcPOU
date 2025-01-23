@@ -3,19 +3,19 @@
   <POU Name="FB_SysLog" Id="{d220da4d-4c63-430e-9504-bb591ec9ab64}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_SysLog
 VAR
-	Event						 : FB_TcMessage;
-	JsonParser					 : FB_JsonDomParser;
-	ExParser 				 : FB_JsonDomParser;
-	TimeFormatter				 : FB_FormatString;
-	MessagesSentThisScan		 : UDINT;
-	Previous_AddEntrySource		 : T_MaxString;
-	Previous_AddEntryMessage	 : T_MaxString;
-	Previous_AddEntryFlags		 : UDINT;
-	Previous_AddEntryJsonSource	 : T_MaxString;
-	Previous_AddEntryJsonMessage : T_MaxString;
-	Previous_AddEntryJsonFlags	 : UDINT;
-	Previous_AddEntryJson		 : T_MaxString;
-	InitComplete				 : BOOL := FALSE;
+	event						 	: FB_TcMessage;
+	jsonParser					 	: FB_JsonDomParser;
+	exParser 				 		: FB_JsonDomParser;
+	timeFormatter				 	: FB_FormatString;
+	messagesSentThisScan		 	: UDINT;
+	previousAddEntrySource		 	: T_MaxString;
+	previousAddEntryMessage	 		: T_MaxString;
+	previousAddEntryFlags		 	: UDINT;
+	previousAddEntryJsonSource	 	: T_MaxString;
+	previousAddEntryJsonMessage 	: T_MaxString;
+	previousAddEntryJsonFlags	 	: UDINT;
+	previousAddEntryJson		 	: T_MaxString;
+	initComplete				 	: BOOL := FALSE;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -37,8 +37,8 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//	IF SUCCEEDED(Event.CreateEx(TC_EVENTS.Tracing.TraceEvent, 0)) THEN
 {analysis -15}
-IF NOT Event.EqualsToEventEntryEx(TC_EVENTS.Tracing.TraceEvent) THEN
-	IF SUCCEEDED(Event.CreateEx(TC_EVENTS.SysLog.Logger, 0)) THEN
+IF ( NOT Event.EqualsToEventEntryEx(TC_EVENTS.Tracing.TraceEvent) ) THEN
+	IF ( SUCCEEDED(Event.CreateEx(TC_EVENTS.SysLog.Logger, 0)) ) THEN
 		InitComplete := TRUE;
 	END_IF
 ELSE
@@ -50,11 +50,11 @@ END_IF]]></ST>
       <Declaration><![CDATA[METHOD PRIVATE M_AddContext
 
 VAR_INPUT
-	Json : SJsonValue;
-	Message : REFERENCE TO T_MaxString;
-	logLevel : E_SysLogLevel;
-	Source : STRING;
-	Flags  : UDINT;
+	json 			: SJsonValue;
+	message 		: REFERENCE TO T_MaxString;
+	logLevel 		: E_SysLogLevel;
+	source 			: STRING;
+	flags  			: UDINT;
 END_VAR
 
 VAR
@@ -65,69 +65,69 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Collect Properties
-CurrentDCTime := DCTIME64_TO_DCTIMESTRUCT(F_GetActualDcTime64());
+currentDCTime := DCTIME64_TO_DCTIMESTRUCT(F_GetActualDcTime64());
 TimeFormatter(
     sFormat := '%2.2d:%2.2d:%2.2d.%3.3d%3.3d',
-    arg1    := F_WORD(CurrentDCTime.wHour),
-    arg2    := F_WORD(CurrentDCTime.wMinute),
-    arg3    := F_WORD(CurrentDCTime.wSecond),
-    arg4    := F_WORD(CurrentDCTime.wMilliseconds),
-    arg5    := F_WORD(CurrentDCTime.wMicroseconds),	
+    arg1    := F_WORD(currentDCTime.wHour),
+    arg2    := F_WORD(currentDCTime.wMinute),
+    arg3    := F_WORD(currentDCTime.wSecond),
+    arg4    := F_WORD(currentDCTime.wMilliseconds),
+    arg5    := F_WORD(currentDCTime.wMicroseconds),	
     bError  => ,    // If there's a formatting error, this is TRUE
     nErrId  =>      // Error ID if bError=TRUE
 );		
-Task := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].TaskName;
-CycleCount := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].CycleCount;
+task := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].TaskName;
+cycleCount := TwinCAT_SystemInfoVarList._TaskInfo[GETCURTASKINDEXEX()].CycleCount;
 
-Event.ipArguments.Clear().AddString(Message);
+event.ipArguments.Clear().AddString(Message);
 
 // Pass properties to Json extnsion for logging.
-JsonParser.AddStringMember(Json, 'Timestamp', TimeFormatter.sOut);
-JsonParser.AddStringMember(Json, 'Message', Message);
-JsonParser.AddUIntMember(Json, 'LogLevel', logLevel);
-JsonParser.AddStringMember(Json, 'Source', Source);
-JsonParser.AddStringMember(Json, 'Context', Task);
-JsonParser.AddUint64Member(Json, 'ScanCount', CycleCount);
-JsonParser.AddUint64Member(Json, 'Flags', Flags);
+jsonParser.AddStringMember(json, 'Timestamp', timeFormatter.sOut);
+jsonParser.AddStringMember(json, 'Message', message);
+jsonParser.AddUIntMember(json, 'LogLevel', logLevel);
+jsonParser.AddStringMember(json, 'Source', source);
+jsonParser.AddStringMember(json, 'Context', task);
+jsonParser.AddUint64Member(json, 'ScanCount', cycleCount);
+jsonParser.AddUint64Member(json, 'Flags', flags);
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="M_AddEntry" Id="{3a21502d-ccdb-4fe9-ba91-818c33927cdc}">
       <Declaration><![CDATA[METHOD M_AddEntry : BOOL
 VAR_INPUT
-	Source	: T_MaxString;
-	Message : T_MaxString;
-	logLevel : E_SysLogLevel;
-	Flags	: UDINT;
+	source				: T_MaxString;
+	message 			: T_MaxString;
+	logLevel 			: E_SysLogLevel;
+	flags				: UDINT;
 END_VAR
 
 VAR
-	Document	  : SJsonValue;
-	JsonAttribute : T_MaxString;
+	document	  		: SJsonValue;
+	jsonAttribute 		: T_MaxString;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT InitComplete THEN
+        <ST><![CDATA[IF ( NOT InitComplete )THEN
 	RETURN;
 END_IF
 
 {analysis -62}
-IF NOT pTracingAllowed THEN
+IF ( NOT pTracingAllowed ) THEN
 	{analysis -90}
 	RETURN;
 END_IF
 
-IF NOT Parameters_Tracing.ALLOW_DUPLICATE_SEQUENTIAL_MESSAGES THEN
-	IF (Source = Previous_AddEntrySource) AND (Message = Previous_AddEntryMessage) AND (Flags = Previous_AddEntryFlags) THEN
+IF ( NOT Parameters_Tracing.ALLOW_DUPLICATE_SEQUENTIAL_MESSAGES ) THEN
+	IF (Source = previousAddEntrySource) AND (Message = previousAddEntryMessage) AND (Flags = previousAddEntryFlags) THEN
 		//This message is identical to the last message sent--ignore
 		RETURN;
 	END_IF
 END_IF
 
 // Create JSON, add Context and add to Event
-Document := JsonParser.NewDocument();
-M_AddContext(JSON := Document, Message := Message, logLevel := logLevel, Source := Source, Flags := Flags);
-JsonAttribute := JsonParser.GetJson(Document);
-Event.SetJsonAttribute(JsonAttribute);
+document := jsonParser.NewDocument();
+M_AddContext(JSON := document, message := message, logLevel := logLevel, source := source, flags := flags);
+jsonAttribute := jsonParser.GetJson(document);
+event.SetJsonAttribute(jsonAttribute);
 
 // Send Event
 Event.Send(0);
@@ -135,11 +135,11 @@ Event.Send(0);
 
 // Tidy up
 MessagesSentThisScan := MessagesSentThisScan + 1;
-MEMSET(ADR(Previous_AddEntrySource), 0, SIZEOF(T_MaxString));
-MEMSET(ADR(Previous_AddEntryMessage), 0, SIZEOF(T_MaxString));
-Previous_AddEntrySource	 := Source;
-Previous_AddEntryMessage := Message;
-Previous_AddEntryFlags	 := Flags;]]></ST>
+MEMSET(ADR(previousAddEntrySource), 0, SIZEOF(T_MaxString));
+MEMSET(ADR(previousAddEntryMessage), 0, SIZEOF(T_MaxString));
+previousAddEntrySource	 := Source;
+previousAddEntryMessage := Message;
+previousAddEntryFlags	 := Flags;]]></ST>
       </Implementation>
     </Method>
     <Property Name="pTracingAllowed" Id="{fbceb28c-262e-4c93-85b5-1faca173531f}">
@@ -193,5 +193,24 @@ END_IF]]></ST>
         </Implementation>
       </Get>
     </Property>
+    <LineIds Name="FB_SysLog">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLog.FB_Init">
+      <LineId Id="3" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLog.M_AddContext">
+      <LineId Id="3" Count="24" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLog.M_AddEntry">
+      <LineId Id="3" Count="32" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SysLog.pTracingAllowed.Get">
+      <LineId Id="3" Count="33" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

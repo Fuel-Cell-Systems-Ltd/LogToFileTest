@@ -6,7 +6,7 @@
     <Method Name="OnTraceReceived" Id="{ecb04e39-5a33-41e2-ab97-d56f2aed52c4}">
       <Declaration><![CDATA[METHOD OnTraceReceived
 VAR_INPUT
-    Message : ST_SysLogMessages;
+    message : ST_SysLogMessages;
 END_VAR]]></Declaration>
     </Method>
   </Itf>
