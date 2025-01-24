@@ -16,6 +16,13 @@
     <Implicit_KindOfTask>{88534e1f-d458-4950-947f-afc17d8b56f7}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{c33d6986-4b4e-4b01-a8c0-1f38e5410207}</Implicit_Jitter_Distribution>
     <LibraryReferences>{2cda5676-ca31-4185-a2a2-65879d95b31f}</LibraryReferences>
+    <Company>FCSL</Company>
+    <Released>false</Released>
+    <Title>Logger</Title>
+    <ProjectVersion>0.1.0.0</ProjectVersion>
+    <DefaultNamespace>Logger</DefaultNamespace>
+    <Author>FCSL</Author>
+    <Description>Logs and tracing</Description>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\E_Result.TcDUT">
@@ -103,6 +110,9 @@
     <Compile Include="POUs\PRG_Main.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Version\Global_Version.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Visualization Manager.TcVMO">
       <SubType>Code</SubType>
     </Compile>
@@ -120,6 +130,7 @@
     <Folder Include="TestComponents" />
     <Folder Include="Library" />
     <Folder Include="POUs" />
+    <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="SPT Base Types">
@@ -193,6 +204,10 @@
     <LibraryReference Include="VisuSymbols,3.5.10.0,System">
       <Namespace>VisuSymbols</Namespace>
     </LibraryReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PinnedGlobalDataType Include="ST_AuditLog" />
+    <PinnedGlobalDataType Include="ST_SysLog" />
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

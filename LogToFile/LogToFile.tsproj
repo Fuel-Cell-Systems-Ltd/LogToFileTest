@@ -1,5 +1,33 @@
 <?xml version="1.0"?>
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53">
+	<DataTypes>
+		<DataType>
+			<Name GUID="{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}" PersistentType="true">AuditLog</Name>
+			<DisplayName TxtId=""><![CDATA[EventClass2_DisplayText]]></DisplayName>
+			<EventId>
+				<Name Id="1">Logger</Name>
+				<DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+				<Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+				<Severity>Verbose</Severity>
+			</EventId>
+		</DataType>
+		<DataType>
+			<Name GUID="{52241E2E-C752-4A67-9055-5A162A83EBAD}" PersistentType="true">SysLog</Name>
+			<DisplayName TxtId=""><![CDATA[Logging]]></DisplayName>
+			<EventId>
+				<Name Id="1">Logger</Name>
+				<DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+				<Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+				<Severity>Verbose</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{67F89083-3E7E-4BB4-A679-B3D0AB132AA9}"/>
+				<Hide GUID="{CC873929-243A-4CC6-8DD9-46A81F27D52E}"/>
+			</Hides>
+		</DataType>
+	</DataTypes>
 	<Project ProjectGUID="{98646747-5D6C-4854-8A16-71B80CBE6F13}" Target64Bit="true" AutoPrioManagement="true" ShowHideConfigurations="#x6">
 		<System>
 			<Settings MaxCpus="16" NonWinCpus="1">
