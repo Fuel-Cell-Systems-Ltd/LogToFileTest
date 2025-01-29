@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcModuleClass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance2" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2009/05/TcModuleClass" GeneratedBy="TwinCAT XAE Plc">
+  <DataTypes>
+    <DataType>
+      <Name GUID="{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}" PersistentType="true">AuditLog</Name>
+      <DisplayName TxtId=""><![CDATA[EventClass2_DisplayText]]></DisplayName>
+      <EventId>
+        <Name Id="1">Logger</Name>
+        <DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+        <Severity>Verbose</Severity>
+        <Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+      </EventId>
+    </DataType>
+    <DataType>
+      <Name GUID="{52241E2E-C752-4A67-9055-5A162A83EBAD}" PersistentType="true">SysLog</Name>
+      <DisplayName TxtId=""><![CDATA[Logging]]></DisplayName>
+      <EventId>
+        <Name Id="1">Logger</Name>
+        <DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+        <Severity>Verbose</Severity>
+        <Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+      </EventId>
+      <Hides>
+        <Hide GUID="{67F89083-3E7E-4BB4-A679-B3D0AB132AA9}" />
+        <Hide GUID="{CC873929-243A-4CC6-8DD9-46A81F27D52E}" />
+      </Hides>
+    </DataType>
+    <DataType>
+      <Name GUID="{FEF7C501-BAAB-4BD7-ADD9-570D908DE1CB}" PersistentType="true">AlarmLog</Name>
+      <DisplayName TxtId=""><![CDATA[EventClass2_DisplayText]]></DisplayName>
+      <EventId>
+        <Name Id="1">Logger</Name>
+        <DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+        <Severity>Verbose</Severity>
+        <Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+      </EventId>
+      <Hides>
+        <Hide GUID="{C80ACE11-C528-45DB-9D1F-09907A397B45}" />
+      </Hides>
+    </DataType>
+  </DataTypes>
+</TcModuleClass>

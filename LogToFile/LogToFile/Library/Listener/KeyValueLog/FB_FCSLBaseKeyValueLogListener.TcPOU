@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_FCSLBaseKeyValueLogListener" Id="{f51dcb8b-e9d9-408e-9c2f-dd465f3346cc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FCSLBaseKeyValueLogListener EXTENDS FB_CyclicFB IMPLEMENTS I_KeyValueLogListener
+
+VAR
+	MessageListener 			: FB_FCSLBaseKeyValueLogMsgListener;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="CyclicLogic" Id="{dbdb8fb6-39e3-478f-b300-ecbec4cc15e6}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT _InitComplete THEN
+    _InitComplete := Initialize();
+    RETURN;
+END_IF
+
+MessageListener.Execute();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{affef0cd-472b-4bdc-a97b-53000bcd8e2c}">
+      <Declaration><![CDATA[METHOD Initialize : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnTraceReceived" Id="{fb3c088b-2c56-4afd-9fe1-f395c1450270}">
+      <Declaration><![CDATA[METHOD OnTraceReceived
+VAR_INPUT
+    message : ST_KeyValueLogMessages;
+END_VAR
+
+VAR
+	timestamp: Tc2_System.T_MaxString;
+	key: Tc2_System.T_MaxString;
+	value: Tc2_System.T_MaxString;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Extract relevant fields
+timestamp   := message.Timestamp;
+key   := message.k;
+value   := message.v;
+]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

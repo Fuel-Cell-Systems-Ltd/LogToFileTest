@@ -1,21 +1,8 @@
 <?xml version="1.0"?>
 <TcEventSources Version="2">
 	<Source>
-		<GUID>{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}</GUID>
+		<GUID>{FEF7C501-BAAB-4BD7-ADD9-570D908DE1CB}</GUID>
 		<Name LcId="1033">EventClass2_DisplayText</Name>
-		<Event>
-			<Id>1</Id>
-			<Message LcId="1033">{0}</Message>
-			<Detail>
-				<Name>Comment</Name>
-				<Text LcId="1033">Arguments:
-0 - Textual message</Text>
-			</Detail>
-		</Event>
-	</Source>
-	<Source>
-		<GUID>{52241E2E-C752-4A67-9055-5A162A83EBAD}</GUID>
-		<Name LcId="1033">Logging</Name>
 		<Event>
 			<Id>1</Id>
 			<Message LcId="1033">{0}</Message>
@@ -40,6 +27,32 @@
 		<Event>
 			<Id>#x2</Id>
 			<Message LcId="1033">{0} - Component is in Simulation mode - Hardware will not operate</Message>
+		</Event>
+	</Source>
+	<Source>
+		<GUID>{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}</GUID>
+		<Name LcId="1033">EventClass2_DisplayText</Name>
+		<Event>
+			<Id>1</Id>
+			<Message LcId="1033">{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text LcId="1033">Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+	</Source>
+	<Source>
+		<GUID>{52241E2E-C752-4A67-9055-5A162A83EBAD}</GUID>
+		<Name LcId="1033">Logging</Name>
+		<Event>
+			<Id>1</Id>
+			<Message LcId="1033">{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text LcId="1033">Arguments:
+0 - Textual message</Text>
+			</Detail>
 		</Event>
 	</Source>
 	<Source>

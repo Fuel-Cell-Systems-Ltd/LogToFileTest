@@ -9,6 +9,9 @@ VAR_GLOBAL
 	
 	// Audit Log
 	auditLog 			: FB_AuditLog;
+	
+	//Alarm Log
+	alarmLog			: FB_AlarmLog;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

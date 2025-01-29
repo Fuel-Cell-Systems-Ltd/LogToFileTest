@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.13">
 	<DataTypes>
 		<DataType>
 			<Name GUID="{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}" PersistentType="true">AuditLog</Name>
@@ -7,9 +7,9 @@
 			<EventId>
 				<Name Id="1">Logger</Name>
 				<DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+				<Severity>Verbose</Severity>
 				<Comment TxtId=""><![CDATA[Arguments:
 0 - Textual message]]></Comment>
-				<Severity>Verbose</Severity>
 			</EventId>
 		</DataType>
 		<DataType>
@@ -18,13 +18,27 @@
 			<EventId>
 				<Name Id="1">Logger</Name>
 				<DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+				<Severity>Verbose</Severity>
 				<Comment TxtId=""><![CDATA[Arguments:
 0 - Textual message]]></Comment>
-				<Severity>Verbose</Severity>
 			</EventId>
 			<Hides>
 				<Hide GUID="{67F89083-3E7E-4BB4-A679-B3D0AB132AA9}"/>
 				<Hide GUID="{CC873929-243A-4CC6-8DD9-46A81F27D52E}"/>
+			</Hides>
+		</DataType>
+		<DataType>
+			<Name GUID="{FEF7C501-BAAB-4BD7-ADD9-570D908DE1CB}" PersistentType="true">AlarmLog</Name>
+			<DisplayName TxtId=""><![CDATA[EventClass2_DisplayText]]></DisplayName>
+			<EventId>
+				<Name Id="1">Logger</Name>
+				<DisplayName TxtId=""><![CDATA[{0}]]></DisplayName>
+				<Severity>Verbose</Severity>
+				<Comment TxtId=""><![CDATA[Arguments:
+0 - Textual message]]></Comment>
+			</EventId>
+			<Hides>
+				<Hide GUID="{C80ACE11-C528-45DB-9D1F-09907A397B45}"/>
 			</Hides>
 		</DataType>
 	</DataTypes>
@@ -45,22 +59,9 @@
 		</System>
 		<Plc>
 			<Project GUID="{96161287-A33F-4BB6-BAB2-5B548564D5FC}" Name="LogToFile" PrjFilePath="LogToFile\LogToFile.plcproj" TmcFilePath="LogToFile\LogToFile.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="LogToFile\LogToFile.tmc" TmcHash="{01B13436-583A-E272-932D-60F379032B0F}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{FF50C650-0951-1097-A818-16DCFF58BF66}" TmcPath="LogToFile\LogToFile.tmc">
 					<Name>LogToFile Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
-						<Name>PlcTask Inputs</Name>
-						<Var>
-							<Name>PRG_TestComponents.Component_1.MyInput</Name>
-							<Comment><![CDATA[ Inputs]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>PRG_TestComponents.Component_2.MyInput</Name>
-							<Comment><![CDATA[ Inputs]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>PlcTask Outputs</Name>
 						<Var>
@@ -71,6 +72,19 @@
 						<Var>
 							<Name>PRG_TestComponents.Component_2.MyOutput</Name>
 							<Comment><![CDATA[ Outputs]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
+						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>PRG_TestComponents.Component_1.MyInput</Name>
+							<Comment><![CDATA[ Inputs]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>PRG_TestComponents.Component_2.MyInput</Name>
+							<Comment><![CDATA[ Inputs]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AlarmLog" Id="{27f9b42a-5da1-4b55-b2cc-9c9eb65fb964}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmLog
+VAR
+	Event						 : FB_TcMessage;
+	JsonParser					 : FB_JsonDomParser;
+	TimeFormatter				 : FB_FormatString;
+	MessagesSentThisScan		 : UDINT;
+	Previous_k	 				 : T_MaxString;
+	Previous_v					 : T_MaxString;
+	InitComplete				 : BOOL := FALSE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{286fd2f1-a3a6-43b8-aea8-77f07bdf0475}">
+      <Declaration><![CDATA[//FB_Init is always available implicitly and it is used primarily for initialization.
+//The return value is not evaluated. For a specific influence, you can also declare the
+//methods explicitly and provide additional code there with the standard initialization
+//code. You can evaluate the return value.
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: the retain variables are initialized (reset warm / reset cold)
+    bInCopyCode: BOOL;  // TRUE: the instance will be copied to the copy code afterward (online change)   
+END_VAR
+
+VAR
+	hr : HRESULT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//	IF SUCCEEDED(Event.CreateEx(TC_EVENTS.Tracing.TraceEvent, 0)) THEN
+{analysis -15}
+IF ( NOT Event.EqualsToEventEntryEx(TC_EVENTS.Tracing.TraceEvent) ) THEN
+	IF ( SUCCEEDED(Event.CreateEx(TC_EVENTS.AlarmLog.Logger, 0)) ) THEN
+		initComplete := TRUE;
+	END_IF
+ELSE
+	initComplete := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

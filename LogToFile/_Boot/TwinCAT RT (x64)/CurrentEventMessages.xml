@@ -1,56 +1,84 @@
 <?xml version="1.0"?>
 <TcEventSources Version="2">
+	<Translations>
+		<Text TxtId="Arguments:&#13;&#10;0 - Textual message"/>
+		<Text TxtId="Arguments:&#13;&#10;0 - Textual message&#13;&#10;1 - DC Timestamp&#13;&#10;2 - Instance (FB name)&#13;&#10;3 - Context (Calling task)&#13;&#10;4 - ScanCount&#13;&#10;5 - Flags"/>
+		<Text TxtId="DT_ComponentBase_Event_SimulationWarning">
+			<Text LcId="1033">{0} - Component is in Simulation mode - Hardware will not operate</Text>
+		</Text>
+		<Text TxtId="DT_EventClass_ComponentBase"/>
+		<Text TxtId="DT_GLOBAL_INIT_REFERENCE_EVENT"/>
+		<Text TxtId="EventClass2_DisplayText"/>
+		<Text TxtId="Logging"/>
+		<Text TxtId="Reference Event that should be the first in all event classes"/>
+		<Text TxtId="Trace Log"/>
+		<Text TxtId="{0}"/>
+		<Text TxtId="{0}|{1}|{2}|{3}|{4}|{5}"/>
+	</Translations>
 	<Source>
-		<GUID>{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}</GUID>
-		<Name LcId="1033">EventClass2_DisplayText</Name>
+		<GUID>{FEF7C501-BAAB-4BD7-ADD9-570D908DE1CB}</GUID>
+		<Name>EventClass2_DisplayText</Name>
 		<Event>
 			<Id>1</Id>
-			<Message LcId="1033">{0}</Message>
+			<Message>{0}</Message>
 			<Detail>
 				<Name>Comment</Name>
-				<Text LcId="1033">Arguments:
-0 - Textual message</Text>
-			</Detail>
-		</Event>
-	</Source>
-	<Source>
-		<GUID>{52241E2E-C752-4A67-9055-5A162A83EBAD}</GUID>
-		<Name LcId="1033">Logging</Name>
-		<Event>
-			<Id>1</Id>
-			<Message LcId="1033">{0}</Message>
-			<Detail>
-				<Name>Comment</Name>
-				<Text LcId="1033">Arguments:
+				<Text>Arguments:
 0 - Textual message</Text>
 			</Detail>
 		</Event>
 	</Source>
 	<Source>
 		<GUID>{3DFE3E0C-5558-48D5-BDF1-F8F81BAADC6F}</GUID>
-		<Name LcId="1033">DT_EventClass_ComponentBase</Name>
+		<Name>DT_EventClass_ComponentBase</Name>
 		<Event>
 			<Id>1</Id>
-			<Message LcId="1033">DT_GLOBAL_INIT_REFERENCE_EVENT</Message>
+			<Message>DT_GLOBAL_INIT_REFERENCE_EVENT</Message>
 			<Detail>
 				<Name>Comment</Name>
-				<Text LcId="1033">Reference Event that should be the first in all event classes</Text>
+				<Text>Reference Event that should be the first in all event classes</Text>
 			</Detail>
 		</Event>
 		<Event>
 			<Id>#x2</Id>
-			<Message LcId="1033">{0} - Component is in Simulation mode - Hardware will not operate</Message>
+			<Message>DT_ComponentBase_Event_SimulationWarning</Message>
+		</Event>
+	</Source>
+	<Source>
+		<GUID>{9C3A1FA1-A5FA-4DF6-A29C-0E2A76A736DC}</GUID>
+		<Name>EventClass2_DisplayText</Name>
+		<Event>
+			<Id>1</Id>
+			<Message>{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text>Arguments:
+0 - Textual message</Text>
+			</Detail>
+		</Event>
+	</Source>
+	<Source>
+		<GUID>{52241E2E-C752-4A67-9055-5A162A83EBAD}</GUID>
+		<Name>Logging</Name>
+		<Event>
+			<Id>1</Id>
+			<Message>{0}</Message>
+			<Detail>
+				<Name>Comment</Name>
+				<Text>Arguments:
+0 - Textual message</Text>
+			</Detail>
 		</Event>
 	</Source>
 	<Source>
 		<GUID>{53984316-BF60-4C28-8DED-3ECE762FB218}</GUID>
-		<Name LcId="1033">Trace Log</Name>
+		<Name>Trace Log</Name>
 		<Event>
 			<Id>1</Id>
-			<Message LcId="1033">{0}|{1}|{2}|{3}|{4}|{5}</Message>
+			<Message>{0}|{1}|{2}|{3}|{4}|{5}</Message>
 			<Detail>
 				<Name>Comment</Name>
-				<Text LcId="1033">Arguments:
+				<Text>Arguments:
 0 - Textual message
 1 - DC Timestamp
 2 - Instance (FB name)

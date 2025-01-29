@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AlarmLogListener" Id="{17741a68-c7bb-46f1-8c9b-fba3b3562d9d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmLogListener EXTENDS FB_CyclicFB IMPLEMENTS I_KeyValueLogListener
+
+VAR
+    MessageListener : FB_FCSLBaseKeyValueLogMsgListener;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Initialize" Id="{431a49c3-2e24-4c2c-b870-5e13e043c5c3}">
+      <Declaration><![CDATA[METHOD Initialize : BOOL
+VAR
+    ListenerFilter : FB_TcEventFilter;
+    hr             : HRESULT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
