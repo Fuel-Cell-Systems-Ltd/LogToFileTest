@@ -4,14 +4,15 @@
     <Declaration><![CDATA[PROGRAM PRG_TestComponents
 VAR
 	// Interfaces
-	iComponent1, iComponet2 : I_TestComponent;	
+	iComponent1, iComponet2, iComponet3 : I_TestComponent;	
 
 	// Componentes
 	Component_1 : FB_Test_Component := (Name := 'TC-01');
 	Component_2 : FB_Test_Component := (Name := 'TC-02');
+	Component_3 : FB_Test_Component := (Name := 'TC-03');
 
 	// Test Triggers
-	Trig1a, Trig1b, Trig2a, Trig2b : BOOL;
+	Trig1a, Trig1b, Trig2a, Trig2b, Trig3a, Trig3b : BOOL;
 END_VAR
 
 ]]></Declaration>
@@ -26,18 +27,35 @@ END_VAR
       <Implementation>
         <ST><![CDATA[// Map Interface
 iComponent1 := Component_1;
-iComponent1 := Component_2;
+iComponet2 := Component_2;
+iComponet3 := Component_3;
 
 // Map Parameters
 Component_1.pTrig := Trig1a;
 Component_1.pTrig2 := Trig1b;
 Component_2.pTrig := Trig2a;
 Component_2.pTrig2 := Trig2b;
+Component_3.pTrig := Trig3a;
+Component_3.pTrig2 := Trig3b;
 
 // Cylic Calls
-Component_1.CyclicLogic();
-Component_2.CyclicLogic();]]></ST>
+Component_1.M_CyclicLogic();
+Component_2.M_CyclicLogic();
+Component_3.M_CyclicLogic();]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="PRG_TestComponents">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="PRG_TestComponents.M_Map">
+      <LineId Id="3" Count="2" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="6" Count="5" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="12" Count="2" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="21" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

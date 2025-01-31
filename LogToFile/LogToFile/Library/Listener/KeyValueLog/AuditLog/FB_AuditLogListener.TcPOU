@@ -1,24 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="FB_AuditLogListener" Id="{75253406-65a3-47be-ae4f-01a902b48fd8}" SpecialFunc="None">
+  <POU Name="FB_AuditLogListener" Id="{854cf6fa-28d0-494b-b931-5c0e300fc6db}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_AuditLogListener EXTENDS FB_FCSLBaseKeyValueLogListener]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Initialize" Id="{1ae9c531-8a99-447d-a014-f6ebbb22892c}">
+    <Method Name="Initialize" Id="{0d9a4034-f8bc-4e50-82da-6a885ae95dc9}">
       <Declaration><![CDATA[METHOD Initialize : BOOL
 VAR
     ListenerFilter : FB_TcEventFilter;
     hr             : HRESULT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[MessageListener.Listener := THIS^;                                   //For callbacks on message received
+        <ST><![CDATA[Listener := THIS^;                                   //For callbacks on message received
 ListenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.AuditLog); //Filter events by tracing class
-hr := MessageListener.Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
+hr := Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
 IF ( SUCCEEDED(hr) ) THEN
     Initialize := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_AuditLogListener">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AuditLogListener.Initialize">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

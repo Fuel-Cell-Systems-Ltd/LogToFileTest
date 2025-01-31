@@ -43,7 +43,7 @@ END_VAR]]></Declaration>
     <Folder Name="Methods" Id="{785d2a36-efb8-4cbd-9276-380be6e85a49}" />
     <Method Name="CyclicLogic" Id="{1d14c55b-7a16-4bb6-af0b-ba890cf004a4}" FolderPath="I_CyclicLogic\">
       <Declaration><![CDATA[//! @summary Basic component initialization logic
-METHOD CyclicLogic
+METHOD PRIVATE CyclicLogic
 
 //! @description This method is called by <c>CyclicLogic()</c> as required
 //! @description This method should be called cyclically by descendant function blocks by invoking <c>SUPER^.CyclicLogic()</c>. 
@@ -68,7 +68,7 @@ IF Trig.Q THEN
 END_IF
 
 IF Trig.Q THEN
-	M_SysLog(msg := CONCAT(Name, ' : Has being triggered 2'), debug := E_SysLogLevel.testing);
+	M_AlarmLog(k := 'Raised', v := 'PT-05 warning raised, value: 5555');
 END_IF
 IF Trig2.Q THEN
 	M_AuditLog(k := 'Login', v := 'User 1234 has logged in');
@@ -115,6 +115,16 @@ METHOD PROTECTED Initialize : BOOL
 
 // Call Super
 Initialize := Super^.Initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="M_CyclicLogic" Id="{83013029-46f0-4c61-9992-9cc575ab89ee}">
+      <Declaration><![CDATA[METHOD M_CyclicLogic : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CyclicLogic();
+//test]]></ST>
       </Implementation>
     </Method>
     <Property Name="pTrig" Id="{6000d349-0d03-40cb-ae39-d4afc417b620}">
@@ -164,6 +174,10 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_Test_Component.Initialize">
       <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Test_Component.M_CyclicLogic">
+      <LineId Id="3" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Test_Component.pTrig.Get">

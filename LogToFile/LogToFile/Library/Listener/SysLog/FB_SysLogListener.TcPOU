@@ -1,14 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_SysLogListener" Id="{bff57947-f3e6-4330-b08e-2921e3579a23}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_SysLogListener EXTENDS FB_CyclicFB IMPLEMENTS I_SysLogListener
-
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SysLogListener EXTENDS FB_ListenerBase2 IMPLEMENTS I_SysLogListener
 VAR
-    messageListener 	: FB_SysLogMsgListener;
+    json          			: FB_JsonDomParser; 		//Parse JSON attribute of messages
+    jsonAttribute 			: STRING(10000);    		//Holds JSON attribute
+    hr           			: HRESULT;         		//Signals JSON attribute was successfully read
+    ipListener    			: I_SysLogListener; 	//Receives callback once message is processed
 	
-	logger 				: FB_LogToFile;
-END_VAR
-]]></Declaration>
+	fbRequestEventText 		: FB_RequestEventText;
+	{attribute 'TcEncoding':='UTF-8'}
+	sLastMessageText 		: STRING;
+	
+	
+	_InitComplete			: BOOL;
+	
+	logger 					: FB_LogToFile;
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -21,7 +29,7 @@ END_VAR
     RETURN;
 END_IF
 
-messageListener.Execute();
+Execute();
 
 logger.CyclicLogic();]]></ST>
       </Implementation>
@@ -33,12 +41,92 @@ VAR
     hr             		: HRESULT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[messageListener.listener := THIS^;                                   //For callbacks on message received
-listenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.SysLog); //Filter events by tracing class
-hr := messageListener.Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
+        <ST><![CDATA[Listener := THIS^;                                   //For callbacks on message received
+ListenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.SysLog); //Filter events by tracing class
+hr := Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
 IF ( SUCCEEDED(hr) ) THEN
-    initialize := TRUE;
+    Initialize := TRUE;
 END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Listener" Id="{a0d84b8e-5f67-495c-8dd5-e60c5051d264}">
+      <Declaration><![CDATA[PROPERTY Listener : I_SysLogListener]]></Declaration>
+      <Set Name="Set" Id="{ed731cd0-bbe6-4cee-9663-21a3494aecc1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ipListener := Listener;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="OnMessageSent" Id="{0eb5572b-760d-4192-945b-5f99556b4724}">
+      <Declaration><![CDATA[METHOD OnMessageSent : Tc3_EventLogger.HRESULT
+VAR_INPUT
+    fbEvent 			: REFERENCE TO FB_TcEvent;
+END_VAR
+
+VAR
+    message      		: ST_SysLogMessages;
+    jsonDocument 		: SJsonValue;
+    jsonProperty 		: SJsonValue;
+	
+	hasMember 			: BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[hr := fbEvent.GetJsonAttribute(JsonAttribute, SIZEOF(JsonAttribute));
+
+IF ( SUCCEEDED(hr) ) THEN
+    jsonDocument := json.ParseDocument(JsonAttribute);
+
+    IF ( json.HasMember(jsonDocument, 'Timestamp') ) THEN
+        jsonProperty      := json.FindMember(JsonDocument, 'Timestamp');
+        message.timestamp := json.GetString(JsonProperty);
+    END_IF
+
+    IF ( json.HasMember(jsonDocument, 'Message') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'Message');
+        message.message := json.GetString(jsonProperty);
+    END_IF
+	
+	IF ( json.HasMember(jsonDocument, 'LogLevel') ) THEN
+        jsonProperty      := json.FindMember(jsonDocument, 'LogLevel');
+        message.logLevel := json.GetUint(jsonProperty);
+    END_IF
+	
+    IF ( json.HasMember(jsonDocument, 'Source') ) THEN
+        jsonProperty   := json.FindMember(jsonDocument, 'Source');
+        message.Source := json.GetString(jsonProperty);
+    END_IF
+
+    IF ( json.HasMember(jsonDocument, 'Context') ) THEN
+        jsonProperty    := json.FindMember(jsonDocument, 'Context');
+        message.Context := json.GetString(jsonProperty);
+    END_IF
+
+    IF ( json.HasMember(jsonDocument, 'ScanCount') ) THEN
+        jsonProperty      := json.FindMember(jsonDocument, 'ScanCount');
+        message.ScanCount := json.GetUint(jsonProperty);
+    END_IF
+
+    IF ( json.HasMember(jsonDocument, 'Flags') ) THEN
+        jsonProperty  := json.FindMember(jsonDocument, 'Flags');
+        message.Flags := json.GetUint(jsonProperty);
+    END_IF
+	
+    IF ( json.HasMember(jsonDocument, 'ExtendedInfo') ) THEN
+        jsonProperty := json.FindMember(jsonDocument, 'ExtendedInfo');
+        message.Json := json.GetString(jsonProperty);
+    END_IF
+
+
+    IF ( ipListener <> 0 ) THEN
+        //Notify listener of message data
+        ipListener.OnTraceReceived(Message);
+    END_IF
+END_IF
+
+OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in order to cancel the callbacks for this program cycle.)]]]]><![CDATA[>]]></ST>
       </Implementation>
     </Method>
     <Method Name="OnTraceReceived" Id="{483f10e7-9961-485a-8b56-0155e3191c75}">
@@ -66,23 +154,9 @@ context   := message.Context;
 scanCount := message.ScanCount;
 flags     := message.Flags;
 
+
 logger.M_AddSysLog(1,msg);]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_SysLogListener">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_SysLogListener.CyclicLogic">
-      <LineId Id="3" Count="6" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_SysLogListener.Initialize">
-      <LineId Id="3" Count="4" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_SysLogListener.OnTraceReceived">
-      <LineId Id="3" Count="8" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

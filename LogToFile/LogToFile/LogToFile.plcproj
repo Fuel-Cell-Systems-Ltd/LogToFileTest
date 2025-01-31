@@ -34,10 +34,13 @@
     <Compile Include="GlobalTextList.TcGTLO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Emitter\AlarmLog\FB_AlarmLog.TcPOU">
+    <Compile Include="Library\Emitter\KeyValueLog\AlarmLog\FB_AlarmLog.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Emitter\FB_FCSLBaseKeyValueLog.TcPOU">
+    <Compile Include="Library\Emitter\KeyValueLog\AuditLog\FB_AuditLog.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Library\Emitter\KeyValueLog\FB_FCSLBaseKeyValueLog.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Listener\KeyValueLog\AlarmLog\FB_AlarmLogListener.TcPOU">
@@ -46,16 +49,13 @@
     <Compile Include="Library\Listener\KeyValueLog\AuditLog\FB_AuditLogListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\KeyValueLog\FB_FCSLBaseKeyValueLogMsgListener.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Library\Listener\KeyValueLog\FB_FCSLBaseKeyValueLogListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Listener\KeyValueLog\I_KeyValueLogListener.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\KeyValueLog\ST_KeyValueLogMessages.TcDUT">
+    <Compile Include="Library\Listener\KeyValueLog\ST_KeyValueLogMessage.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Listener\PRG_Log_Main.TcPOU">
@@ -64,16 +64,10 @@
     <Compile Include="Library\Listener\SysLog\FB_SysLogListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Library\Listener\SysLog\FB_SysLogMsgListener.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Library\Listener\SysLog\I_SysLogListener.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Listener\SysLog\ST_SysLogMessages.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Library\Emitter\AuditLog\FB_AuditLog.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Library\Emitter\GVL_FCSLTracing.TcGVL">
@@ -134,14 +128,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
-    <Folder Include="Library\Emitter\AlarmLog" />
+    <Folder Include="Library\Emitter\KeyValueLog" />
+    <Folder Include="Library\Emitter\KeyValueLog\AlarmLog" />
+    <Folder Include="Library\Emitter\KeyValueLog\AuditLog" />
     <Folder Include="Library\Listener" />
     <Folder Include="Library\Listener\KeyValueLog" />
     <Folder Include="Library\Listener\KeyValueLog\AlarmLog" />
     <Folder Include="Library\Listener\KeyValueLog\AuditLog" />
     <Folder Include="Library\Listener\SysLog" />
     <Folder Include="Library\Emitter" />
-    <Folder Include="Library\Emitter\AuditLog" />
     <Folder Include="Library\Emitter\SysLog" />
     <Folder Include="TestComponents\Test Components" />
     <Folder Include="LogToFile" />

@@ -97,6 +97,30 @@ _fileExtension := LOG_SETTINGS.FileType;
 _timeOut := LOG_TIMEOUT;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="M_AddKeyValueLog" Id="{aedbbeba-6d1c-4158-8629-5e4094d2245a}">
+      <Declaration><![CDATA[METHOD M_AddKeyValueLog : BOOL
+
+VAR_INPUT
+    message : ST_KeyValueLogMessage;
+END_VAR
+
+VAR
+    logEntry : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Concatenate severity and message
+logEntry := CONCAT(message.k, ' - ');
+logEntry := CONCAT(logEntry, message.v);
+logEntry := CONCAT(logEntry, ' at ');
+logEntry := CONCAT(logEntry, message.timestamp);
+
+// Add log entry to ring buffer
+ringBuffer.A_AddTail(putValue := logEntry);
+IF ( NOT ringbuffer.bOk ) THEN
+	// Handle write error (optional)END_IF;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="M_AddSysLog" Id="{1b2fb357-e815-4ace-afb2-8f3df1c1dad2}">
       <Declaration><![CDATA[METHOD PUBLIC M_AddSysLog : BOOL
 
@@ -347,6 +371,14 @@ M_WriteToFile := fileWrite.bBusy;]]></ST>
     <LineIds Name="FB_LogToFile.FB_init">
       <LineId Id="19" Count="3" />
       <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_LogToFile.M_AddKeyValueLog">
+      <LineId Id="16" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="19" Count="5" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_LogToFile.M_AddSysLog">
       <LineId Id="3" Count="8" />

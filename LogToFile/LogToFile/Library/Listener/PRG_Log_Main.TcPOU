@@ -4,12 +4,14 @@
     <Declaration><![CDATA[PROGRAM PRG_Log_Main
 
 VAR
-	sysLogger 		: FB_SysLogLIstener;
-	auditLogger		: FB_AuditLogLIstener;
+	sysLogger 		: FB_SysLogListener;
+	auditLogger		: FB_AuditLogListener;
+	alarmLogger		: FB_AlarmLogListener;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[sysLogger.CyclicLogic();
-auditLogger.CyclicLogic();]]></ST>
+auditLogger.CyclicLogic();
+alarmLogger.CyclicLogic();]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

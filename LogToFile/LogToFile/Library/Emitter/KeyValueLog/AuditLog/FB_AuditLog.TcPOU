@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_AuditLog" Id="{9f088aee-3833-491d-b09c-e2687a7d2630}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AuditLog EXTENDS FB_FCSLBaseKeyValueLog]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{7a89f529-4923-4ae2-917a-ed5d3a9b919e}">
+      <Declaration><![CDATA[//FB_Init is always available implicitly and it is used primarily for initialization.
+//The return value is not evaluated. For a specific influence, you can also declare the
+//methods explicitly and provide additional code there with the standard initialization
+//code. You can evaluate the return value.
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: the retain variables are initialized (reset warm / reset cold)
+    bInCopyCode: BOOL;  // TRUE: the instance will be copied to the copy code afterward (online change)   
+END_VAR
+
+VAR
+	hr : HRESULT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//	IF SUCCEEDED(Event.CreateEx(TC_EVENTS.Tracing.TraceEvent, 0)) THEN
+{analysis -15}
+IF ( NOT Event.EqualsToEventEntryEx(TC_EVENTS.Tracing.TraceEvent) ) THEN
+	IF ( SUCCEEDED(Event.CreateEx(TC_EVENTS.AuditLog.Logger, 0)) ) THEN
+		initComplete := TRUE;
+	END_IF
+ELSE
+	initComplete := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

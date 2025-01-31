@@ -9,6 +9,20 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Method Name="M_AlarmLog" Id="{0c121352-ec5f-4c2a-8a74-92abb81043a3}">
+      <Declaration><![CDATA[METHOD M_AlarmLog : HRESULT
+
+VAR_INPUT
+	k : T_MaxString;
+	v : T_MaxString;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GVL_FCSLTracing.alarmLog.M_AddEntry(k := k, v := v);
+
+M_AlarmLog := S_OK;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="M_AuditLog" Id="{abb9e373-22da-47da-a2c3-e3f1e7cd875a}">
       <Declaration><![CDATA[METHOD M_AuditLog : HRESULT
 
@@ -55,6 +69,10 @@ M_SysLog := S_OK;]]></ST>
     </Method>
     <LineIds Name="FB_FCSLComponentBase">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FCSLComponentBase.M_AlarmLog">
+      <LineId Id="12" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_FCSLComponentBase.M_AuditLog">
       <LineId Id="3" Count="1" />

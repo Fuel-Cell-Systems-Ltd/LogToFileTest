@@ -1,12 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
   <POU Name="FB_AlarmLogListener" Id="{17741a68-c7bb-46f1-8c9b-fba3b3562d9d}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmLogListener EXTENDS FB_CyclicFB IMPLEMENTS I_KeyValueLogListener
-
-VAR
-    MessageListener : FB_FCSLBaseKeyValueLogMsgListener;
-END_VAR
-
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_AlarmLogListener EXTENDS FB_FCSLBaseKeyValueLogListener
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -18,8 +13,20 @@ VAR
     hr             : HRESULT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[Listener := THIS^;                                   //For callbacks on message received
+ListenerFilter.Clear().EventClass.EqualTo(TC_EVENT_CLASSES.AlarmLog); //Filter events by tracing class
+hr := Subscribe2(ListenerFilter);                    //Subscribe to retrieve defined events
+IF ( SUCCEEDED(hr) ) THEN
+    Initialize := TRUE;
+END_IF]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_AlarmLogListener">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AlarmLogListener.Initialize">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
